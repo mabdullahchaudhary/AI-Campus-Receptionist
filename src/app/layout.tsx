@@ -1,37 +1,21 @@
 import type { Metadata } from "next";
-import { Inter, Sora } from "next/font/google";
 import SessionProvider from "@/components/providers/SessionProvider";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
-const sora = Sora({
-  subsets: ["latin"],
-  variable: "--font-cabinet",
-  display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
-});
-
 export const metadata: Metadata = {
-  title: "Superior AI — Intelligent Voice Receptionist for Universities",
-  description:
-    "The enterprise AI voice agent that handles admissions, schedules visits, and manages every call — 24/7, in English & Urdu.",
+  title: "Superior AI — Intelligent Voice Receptionist",
+  description: "Enterprise AI voice agent for universities — 24/7, multilingual.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${inter.variable} ${sora.variable} font-sans min-h-screen noise`}
-      >
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+      </head>
+      <body className="font-sans min-h-screen noise antialiased">
         <SessionProvider>{children}</SessionProvider>
       </body>
     </html>

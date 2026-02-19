@@ -3,10 +3,7 @@
  * CENTRAL CONFIGURATION — ALL API KEYS, URLs, AND SETTINGS
  * ═══════════════════════════════════════════════════════════════
  *
- * IMPORTANT: This is the ONLY file where API keys and URLs
- * should be defined. All other files import from here.
- *
- * To change ANY key or URL → change it HERE → done everywhere.
+ * CHANGE ANY KEY OR URL HERE → CHANGES EVERYWHERE
  */
 
 // ==================== SUPABASE ====================
@@ -17,6 +14,25 @@ export const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
 export const VAPI_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY || "";
 export const VAPI_ASSISTANT_ID = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID || "34cd5986-2239-40b9-9762-d11d89dab004";
 export const VAPI_API_URL = "https://api.vapi.ai";
+
+// ==================== VAPI ASSISTANT CONFIG ====================
+// These match your EXACT Vapi dashboard settings
+export const VAPI_MODEL_CONFIG = {
+    provider: "groq" as const,          // FREE! Not OpenAI
+    model: "llama-3.1-8b-instant",      // Fast + Free on Groq
+    temperature: 0.7,
+};
+
+export const VAPI_VOICE_CONFIG = {
+    provider: "vapi" as const,           // Vapi's own voices
+    voiceId: "Elliot",                   // Your selected voice
+};
+
+export const VAPI_TRANSCRIBER_CONFIG = {
+    provider: "deepgram" as const,
+    model: "nova-2",
+    language: "en",
+};
 
 // ==================== N8N ====================
 export const N8N_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || "https://superiorproject.app.n8n.cloud/webhook/ai-receptionist";
@@ -35,15 +51,15 @@ export const DEFAULT_CLIENT_ID = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
 // ==================== PLAN LIMITS ====================
 export const PLAN_LIMITS = {
     free: {
-        maxSeconds: 120,        // 2 minutes total per day
+        maxSeconds: 120,
         maxCallAttempts: 10,
-        maxCallDuration: 120,   // 2 min per call
+        maxCallDuration: 120,
         features: ["2-min calls", "Basic transcript", "Knowledge base (view only)"],
     },
     pro: {
-        maxSeconds: 3600,       // 60 minutes total per day
+        maxSeconds: 3600,
         maxCallAttempts: 1000,
-        maxCallDuration: 1800,  // 30 min per call
+        maxCallDuration: 1800,
         features: ["Unlimited calls", "Full transcripts", "Knowledge base CRUD", "Contact CRM", "Appointments", "Analytics", "BYOK", "Priority support"],
     },
     enterprise: {

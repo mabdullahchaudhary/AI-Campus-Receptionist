@@ -1,68 +1,79 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { motion } from "framer-motion";
-import { User, Shield, Bell } from "lucide-react";
+import { User, Mail, Shield, Globe, Bell, Palette, Clock } from "lucide-react";
+import { PageHeader, Badge } from "@/components/ui/Skeleton";
+import { UNIVERSITY_NAME, UNIVERSITY_PHONE, APP_NAME } from "@/lib/config";
 
 export default function SettingsPage() {
     const { data: session } = useSession();
+    const user = session?.user as any;
+
+    const sections = [
+        {
+            title: "Profile",
+            icon: User,
+            items: [
+                { label: "Name", value: user?.name || "—" },
+                { label: "Email", value: user?.email || "—" },
+                { label: "Plan", value: (user?.plan || "free").toUpperCase() },
+                { label: "Joined", value: "February 2026" },
+            ],
+        },
+        {
+            title: "AI Agent",
+            icon: Globe,
+            items: [
+                { label: "Assistant", value: "Riley" },
+                { label: "Model", value: "Groq — Llama 3.1 8B" },
+                { label: "Voice", value: "Vapi — Elliot" },
+                { label: "Languages", value: "English, Urdu, Urdlish" },
+                { label: "Tools", value: "16 active" },
+                { label: "University", value: UNIVERSITY_NAME },
+                { label: "Contact", value: UNIVERSITY_PHONE },
+            ],
+        },
+        {
+            title: "Security",
+            icon: Shield,
+            items: [
+                { label: "Auth Method", value: "Google OAuth" },
+                { label: "6-Layer Verification", value: "Enabled" },
+                { label: "Device Fingerprinting", value: "Active" },
+                { label: "Rate Limiting", value: "Active" },
+            ],
+        },
+        {
+            title: "Preferences",
+            icon: Palette,
+            items: [
+                { label: "Theme", value: "Light" },
+                { label: "Timezone", value: "Asia/Karachi (PKT)" },
+                { label: "Notifications", value: "Email" },
+            ],
+        },
+    ];
 
     return (
-        <div className="max-w-3xl mx-auto">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-                <h1 className="text-3xl font-heading font-extrabold">Settings</h1>
-                <p className="text-muted-foreground mt-1">Manage your account and preferences.</p>
-            </motion.div>
+        <div className="space-y-6 max-w-3xl">
+            <PageHeader title="Settings" subtitle="Manage your account and preferences" />
 
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="mt-8 space-y-6"
-            >
-                {/* Profile */}
-                <div className="p-6 rounded-2xl glass">
-                    <div className="flex items-center gap-3 mb-6">
-                        <User className="w-5 h-5 text-violet-400" />
-                        <h2 className="text-lg font-heading font-bold">Profile</h2>
+            {sections.map((section) => (
+                <div key={section.title} className="bg-white rounded-2xl border border-gray-200/60 shadow-card overflow-hidden">
+                    <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2.5">
+                        <section.icon className="w-4 h-4 text-violet-500" />
+                        <h3 className="text-sm font-heading font-bold">{section.title}</h3>
                     </div>
-                    <div className="flex items-center gap-4">
-                        {session?.user?.image ? (
-                            <img src={session.user.image} alt="" className="w-16 h-16 rounded-2xl" />
-                        ) : (
-                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-2xl font-bold text-white">
-                                {session?.user?.name?.charAt(0)}
+                    <div className="divide-y divide-gray-50">
+                        {section.items.map((item) => (
+                            <div key={item.label} className="px-5 py-3 flex items-center justify-between">
+                                <span className="text-sm text-muted-foreground">{item.label}</span>
+                                <span className="text-sm font-medium">{item.value}</span>
                             </div>
-                        )}
-                        <div>
-                            <p className="font-heading font-bold text-lg">{session?.user?.name}</p>
-                            <p className="text-sm text-muted-foreground">{session?.user?.email}</p>
-                        </div>
+                        ))}
                     </div>
                 </div>
-
-                {/* Security */}
-                <div className="p-6 rounded-2xl glass">
-                    <div className="flex items-center gap-3 mb-4">
-                        <Shield className="w-5 h-5 text-violet-400" />
-                        <h2 className="text-lg font-heading font-bold">Security</h2>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                        You are signed in with Google OAuth. Your account security is managed by Google.
-                    </p>
-                </div>
-
-                {/* Notifications */}
-                <div className="p-6 rounded-2xl glass">
-                    <div className="flex items-center gap-3 mb-4">
-                        <Bell className="w-5 h-5 text-violet-400" />
-                        <h2 className="text-lg font-heading font-bold">Notifications</h2>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                        Email notification settings will be available with the Pro plan.
-                    </p>
-                </div>
-            </motion.div>
+            ))}
         </div>
     );
 }

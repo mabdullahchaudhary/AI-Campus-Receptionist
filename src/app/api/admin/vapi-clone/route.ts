@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { N8N_WEBHOOK_URL, VAPI_API_URL } from "@/lib/config";
+import { VAPI_API_URL, N8N_WEBHOOK_URL } from "@/lib/config";
 
 function verifyAdmin(req: NextRequest) {
     const token = req.cookies.get("admin_token")?.value;
@@ -12,110 +12,415 @@ function verifyAdmin(req: NextRequest) {
     } catch { return null; }
 }
 
-function getRileyConfig(serverUrl: string) {
+// All 16 tools — each one will be created separately via POST /tool
+function getAllTools() {
+    const serverConfig = {
+        url: N8N_WEBHOOK_URL,
+        timeoutSeconds: 20,
+    };
+
+    return [
+        {
+            type: "function",
+            function: {
+                name: "check_knowledge",
+                description: "Search the university knowledge base to find information about fees, admissions, scholarships, departments, campus facilities, contact information, or any other topic. ALWAYS use this tool when the caller asks ANY question about the university.",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        query: { type: "string", description: "The caller's question or topic to search for" },
+                        category: { type: "string", description: "Optional category: admissions, fees, scholarships, departments, campus, contact, hostel, transport, general" },
+                    },
+                    required: ["query"],
+                },
+            },
+            messages: [{ type: "request-start", blocking: false }],
+            server: serverConfig,
+        },
+        {
+            type: "function",
+            function: {
+                name: "check_fee",
+                description: "Get the exact fee structure for a specific academic program. Use when caller asks about tuition, costs, or payment plans.",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        program: { type: "string", description: "The program name, e.g. BS Computer Science, MBA, Pharm-D" },
+                    },
+                    required: ["program"],
+                },
+            },
+            messages: [{ type: "request-start", blocking: false }],
+            server: serverConfig,
+        },
+        {
+            type: "function",
+            function: {
+                name: "check_scholarship",
+                description: "Check scholarship eligibility and available types. Use when caller asks about financial aid, discounts, or merit scholarships.",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        query: { type: "string", description: "The scholarship-related question" },
+                        marks_percentage: { type: "string", description: "The caller's marks percentage if mentioned" },
+                    },
+                    required: ["query"],
+                },
+            },
+            messages: [{ type: "request-start", blocking: false }],
+            server: serverConfig,
+        },
+        {
+            type: "function",
+            function: {
+                name: "check_hostel",
+                description: "Get hostel availability, room types, pricing, and facilities. Use when caller asks about accommodation.",
+                parameters: { type: "object", properties: {}, required: [] },
+            },
+            messages: [{ type: "request-start", blocking: false }],
+            server: serverConfig,
+        },
+        {
+            type: "function",
+            function: {
+                name: "check_transport",
+                description: "Get university bus routes, timings, and transport fees. Use when caller asks about transportation.",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        area: { type: "string", description: "The area the caller lives in" },
+                    },
+                    required: [],
+                },
+            },
+            messages: [{ type: "request-start", blocking: false }],
+            server: serverConfig,
+        },
+        {
+            type: "function",
+            function: {
+                name: "check_campus",
+                description: "Get campus facilities, labs, library, sports, and amenities information.",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        query: { type: "string", description: "Specific facility question" },
+                    },
+                    required: [],
+                },
+            },
+            messages: [{ type: "request-start", blocking: false }],
+            server: serverConfig,
+        },
+        {
+            type: "function",
+            function: {
+                name: "check_faq",
+                description: "Answer FAQs about HEC recognition, transfers, refund policy, dress code, etc.",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        question: { type: "string", description: "The FAQ question" },
+                    },
+                    required: ["question"],
+                },
+            },
+            messages: [{ type: "request-start", blocking: false }],
+            server: serverConfig,
+        },
+        {
+            type: "function",
+            function: {
+                name: "check_departments",
+                description: "Get a list of all departments, faculties, and academic programs offered.",
+                parameters: { type: "object", properties: {}, required: [] },
+            },
+            messages: [{ type: "request-start", blocking: false }],
+            server: serverConfig,
+        },
+        {
+            type: "function",
+            function: {
+                name: "check_admission_status",
+                description: "Get admission dates, deadlines, process, documents, and entry test info.",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        query: { type: "string", description: "Specific admission question" },
+                    },
+                    required: [],
+                },
+            },
+            messages: [{ type: "request-start", blocking: false }],
+            server: serverConfig,
+        },
+        {
+            type: "function",
+            function: {
+                name: "save_contact",
+                description: "Save caller's contact info. ONLY use when caller provides their REAL name. Never save unknown or empty.",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        name: { type: "string", description: "Caller's full name (must be real)" },
+                        phone: { type: "string", description: "Phone number" },
+                        email: { type: "string", description: "Email address" },
+                    },
+                    required: ["name"],
+                },
+            },
+            messages: [{ type: "request-start", blocking: false }],
+            server: serverConfig,
+        },
+        {
+            type: "function",
+            function: {
+                name: "book_visit",
+                description: "Schedule a campus visit appointment. Use when caller wants to visit university.",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        name: { type: "string", description: "Visitor name" },
+                        phone: { type: "string", description: "Phone number" },
+                        department: { type: "string", description: "Department to visit" },
+                        datetime: { type: "string", description: "Preferred date/time" },
+                    },
+                    required: ["name"],
+                },
+            },
+            messages: [{ type: "request-start", blocking: false }],
+            server: serverConfig,
+        },
+        {
+            type: "function",
+            function: {
+                name: "detect_returning",
+                description: "Check if caller has called before to personalize greeting.",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        phone: { type: "string", description: "Caller's phone number" },
+                    },
+                    required: ["phone"],
+                },
+            },
+            messages: [{ type: "request-start", blocking: false }],
+            server: serverConfig,
+        },
+        {
+            type: "function",
+            function: {
+                name: "score_lead",
+                description: "Rate how interested a caller is to prioritize follow-up.",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        name: { type: "string", description: "Caller name" },
+                        phone: { type: "string", description: "Phone" },
+                        program: { type: "string", description: "Interested program" },
+                        interest_level: { type: "string", description: "high, medium, or low" },
+                    },
+                    required: ["name", "interest_level"],
+                },
+            },
+            messages: [{ type: "request-start", blocking: false }],
+            server: serverConfig,
+        },
+        {
+            type: "function",
+            function: {
+                name: "schedule_callback",
+                description: "Schedule callback from university staff when caller requests follow-up.",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        name: { type: "string", description: "Caller name" },
+                        phone: { type: "string", description: "Phone to call back" },
+                        reason: { type: "string", description: "Callback reason" },
+                        preferred_time: { type: "string", description: "When to call" },
+                    },
+                    required: ["name", "phone"],
+                },
+            },
+            messages: [{ type: "request-start", blocking: false }],
+            server: serverConfig,
+        },
+        {
+            type: "function",
+            function: {
+                name: "transfer_human",
+                description: "Transfer to human receptionist. Use when frustrated or asks for human.",
+                parameters: { type: "object", properties: {}, required: [] },
+            },
+            messages: [{ type: "request-start", blocking: false }],
+            server: serverConfig,
+        },
+        {
+            type: "function",
+            function: {
+                name: "end_conversation",
+                description: "Gracefully end the conversation. Use when caller says goodbye or has no more questions.",
+                parameters: { type: "object", properties: {}, required: [] },
+            },
+            messages: [{ type: "request-start", blocking: false }],
+            server: serverConfig,
+        },
+    ];
+}
+
+async function cloneToAccount(provider: any) {
+    const privateKey = provider.api_key_private;
+    const tools = getAllTools();
+    const createdToolIds: string[] = [];
+    const toolResults: any[] = [];
+
+    // STEP 1: Create all 16 tools on the new account
+    for (const tool of tools) {
+        try {
+            const res = await fetch(`${VAPI_API_URL}/tool`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${privateKey}`,
+                },
+                body: JSON.stringify(tool),
+            });
+
+            if (res.ok) {
+                const created = await res.json();
+                createdToolIds.push(created.id);
+                toolResults.push({ name: tool.function.name, status: "created", id: created.id });
+            } else {
+                const err = await res.text();
+                toolResults.push({ name: tool.function.name, status: "failed", error: err });
+            }
+        } catch (e: any) {
+            toolResults.push({ name: tool.function.name, status: "failed", error: e.message });
+        }
+    }
+
+    // STEP 2: Create the assistant with toolIds referencing the new tools
     const systemPrompt = `# Identity
-You are Riley, the AI Receptionist for Superior University, Lahore.
+You are Riley, the AI Receptionist for Superior University, Lahore — Pakistan's leading private university on Raiwind Road.
 
 # CRITICAL RULES
-1. For EVERY question → call check_knowledge FIRST
-2. NEVER say "I don't know" — always search knowledge base
-3. Include specific numbers, dates, PKR amounts
-4. Keep voice responses to 2-3 sentences
-5. Ask ONE follow-up after each answer
+1. For EVERY university question → call check_knowledge FIRST
+2. For fee questions → call check_fee with the program name
+3. For scholarship → call check_scholarship
+4. NEVER say "I don't know" — always search knowledge base
+5. NEVER redirect to website without first checking knowledge
+6. Include specific numbers, dates, and PKR amounts
+7. Keep voice responses to 2-3 sentences max
+8. Ask ONE follow-up question after each answer
 
-# Language: Match the caller (English/Urdu/Mixed)
+# Language Detection
+- English caller → respond in English
+- Urdu caller → respond in Urdu
+- Mixed (Urdlish) → respond in same mixed style
+- Auto-detect from first message and match
 
 # Tool Priority
-- ANY question → check_knowledge
-- Fee → check_fee | Scholarship → check_scholarship
-- Hostel → check_hostel | Transport → check_transport
-- Campus → check_campus | FAQ → check_faq
-- Departments → check_departments | Admission → check_admission_status
-- Name shared → save_contact | Visit → book_visit
-- Callback → schedule_callback | Frustrated → transfer_human
+- ANY question → check_knowledge first
+- Fee/cost → check_fee
+- Scholarship/discount → check_scholarship
+- Hostel/accommodation → check_hostel
+- Transport/bus → check_transport
+- Facilities/campus → check_campus
+- Common questions → check_faq
+- Programs/departments → check_departments
+- Admission → check_admission_status
+- Caller shares name → save_contact (real names ONLY)
+- Wants visit → book_visit
+- Wants callback → schedule_callback
+- Frustrated/angry → transfer_human
 - Goodbye → end_conversation
 
-# Contact: NEVER save "unknown". Ask name FIRST, then phone.
-# NEVER say "As an AI" or ask name+phone+email at once.`;
+# Contact Rules
+- NEVER save "unknown", "null", empty names
+- Ask name FIRST, then phone. ONE at a time.
 
-    const makeTool = (name: string, desc: string, params: Record<string, any> = {}, required: string[] = []) => ({
-        type: "function" as const,
-        function: {
-            name,
-            description: desc,
-            parameters: {
-                type: "object" as const,
-                properties: params,
-                required,
-            },
-        },
-        server: { url: serverUrl },
-    });
+# Personality
+- Warm, professional, knowledgeable, confident
+- Proactive: suggests related info and campus visits
 
-    return {
-        name: "Riley - Superior AI",
+# NEVER say "As an AI" or ask name+phone+email at once`;
+
+    const assistantConfig = {
+        name: "Riley",
+        firstMessage: "Assalam-o-Alaikum! Superior University mein call karne ka shukriya. I'm here to help you with admissions, campus visits, fee structure, department information, or any other questions. Aap kaise help chahte hain aaj?",
+        voicemailMessage: "Assalam-o-Alaikum, this is the AI Receptionist from Superior University. Please call us back at 042-35761999. Thank you!",
+        endCallMessage: "Thank you for calling Superior University! Allah Hafiz!",
+        endCallPhrases: ["goodbye", "talk to you soon"],
         model: {
-            provider: "openai",
-            model: "gpt-4o-mini",
+            provider: "groq",
+            model: "llama-3.1-8b-instant",
             temperature: 0.7,
+            toolIds: createdToolIds,
             messages: [{ role: "system", content: systemPrompt }],
         },
         voice: {
-            provider: "playht",
-            voiceId: "jennifer",
+            provider: "vapi",
+            voiceId: "Elliot",
+            fallbackPlan: { voices: [{ provider: "vapi", voiceId: "Dan" }] },
         },
-        firstMessage: "Assalam-o-Alaikum! Superior University mein call karne ka shukriya. Main Riley hoon, aapki kya madad kar sakta hoon?",
-        serverUrl: serverUrl,
-        maxDurationSeconds: 600,
-        endCallFunctionEnabled: true,
         transcriber: {
             provider: "deepgram",
             model: "nova-2",
             language: "en",
+            endpointing: 150,
+        },
+        server: {
+            url: N8N_WEBHOOK_URL,
+            timeoutSeconds: 20,
+        },
+        startSpeakingPlan: {
+            waitSeconds: 0.4,
+            smartEndpointingEnabled: "livekit",
+        },
+        backgroundSound: "off",
+        messagePlan: {
+            idleMessages: ["I'm still here if you need assistance."],
         },
         clientMessages: [
-            "transcript", "hang", "function-call",
-            "speech-update", "metadata", "conversation-update",
+            "conversation-update", "function-call", "hang", "model-output",
+            "speech-update", "status-update", "transfer-update", "transcript",
+            "tool-calls", "user-interrupted", "voice-input",
         ],
         serverMessages: [
-            "end-of-call-report", "function-call", "hang",
+            "conversation-update", "end-of-call-report", "function-call",
+            "hang", "speech-update", "status-update", "tool-calls",
+            "transfer-destination-request", "user-interrupted",
         ],
     };
-}
 
-function getToolsConfig(serverUrl: string) {
-    const makeTool = (name: string, desc: string, params: Record<string, any> = {}, required: string[] = []) => ({
-        type: "function" as const,
-        function: {
-            name,
-            description: desc,
-            parameters: {
-                type: "object" as const,
-                properties: params,
-                required,
-            },
+    const createRes = await fetch(`${VAPI_API_URL}/assistant`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${privateKey}`,
         },
-        server: { url: serverUrl },
+        body: JSON.stringify(assistantConfig),
     });
 
-    return [
-        makeTool("check_knowledge", "Search knowledge base for ANY question. ALWAYS use first.", { query: { type: "string", description: "The question" }, category: { type: "string", description: "admissions/fees/scholarships/departments/campus/contact/hostel/transport/general" } }, ["query"]),
-        makeTool("check_fee", "Get exact fee for a program.", { program: { type: "string", description: "Program name" } }, ["program"]),
-        makeTool("check_scholarship", "Check scholarship eligibility.", { query: { type: "string", description: "Question" }, marks_percentage: { type: "string", description: "Marks %" } }, ["query"]),
-        makeTool("check_hostel", "Get hostel info and pricing.", {}),
-        makeTool("check_transport", "Get bus routes and fees.", { area: { type: "string", description: "Caller area" } }),
-        makeTool("check_campus", "Get campus facilities info.", { query: { type: "string", description: "Facility question" } }),
-        makeTool("check_faq", "Answer FAQs.", { question: { type: "string", description: "The question" } }, ["question"]),
-        makeTool("check_departments", "List departments and programs.", {}),
-        makeTool("check_admission_status", "Get admission info.", { query: { type: "string", description: "Question" } }),
-        makeTool("save_contact", "Save caller contact. Real names ONLY.", { name: { type: "string", description: "Full name" }, phone: { type: "string", description: "Phone" }, email: { type: "string", description: "Email" } }, ["name"]),
-        makeTool("book_visit", "Schedule campus visit.", { name: { type: "string", description: "Name" }, phone: { type: "string", description: "Phone" }, department: { type: "string", description: "Department" }, datetime: { type: "string", description: "Date/time" } }, ["name"]),
-        makeTool("detect_returning", "Check if returning caller.", { phone: { type: "string", description: "Phone" } }, ["phone"]),
-        makeTool("score_lead", "Rate caller interest.", { name: { type: "string", description: "Name" }, phone: { type: "string", description: "Phone" }, program: { type: "string", description: "Program" }, interest_level: { type: "string", description: "high/medium/low" } }, ["name", "interest_level"]),
-        makeTool("schedule_callback", "Schedule follow-up call.", { name: { type: "string", description: "Name" }, phone: { type: "string", description: "Phone" }, reason: { type: "string", description: "Reason" }, preferred_time: { type: "string", description: "When" } }, ["name", "phone"]),
-        makeTool("transfer_human", "Transfer to human.", {}),
-        makeTool("end_conversation", "End call gracefully.", {}),
-    ];
+    if (!createRes.ok) {
+        const err = await createRes.text();
+        throw new Error(`Assistant creation failed: ${err}`);
+    }
+
+    const assistant = await createRes.json();
+
+    // Save to database
+    await supabase
+        .from("credit_providers")
+        .update({ assistant_id: assistant.id, last_checked_at: new Date().toISOString() })
+        .eq("id", provider.id);
+
+    return {
+        assistantId: assistant.id,
+        toolsCreated: createdToolIds.length,
+        totalTools: tools.length,
+        toolResults,
+    };
 }
 
 export async function POST(req: NextRequest) {
@@ -129,146 +434,78 @@ export async function POST(req: NextRequest) {
         switch (action) {
             case "clone_to_account": {
                 const { providerId } = body;
-
-                const { data: provider } = await supabase
-                    .from("credit_providers")
-                    .select("*")
-                    .eq("id", providerId)
-                    .single();
-
+                const { data: provider } = await supabase.from("credit_providers").select("*").eq("id", providerId).single();
                 if (!provider) return NextResponse.json({ error: "Provider not found" }, { status: 404 });
                 if (!provider.api_key_private) return NextResponse.json({ error: "Private API key required" }, { status: 400 });
 
-                const serverUrl = N8N_WEBHOOK_URL;
-
-                // Step 1: Create assistant (without tools — Vapi API requirement)
-                const assistantConfig = getRileyConfig(serverUrl);
-
-                const createRes = await fetch(`${VAPI_API_URL}/assistant`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${provider.api_key_private}`,
-                    },
-                    body: JSON.stringify(assistantConfig),
-                });
-
-                if (!createRes.ok) {
-                    const errText = await createRes.text();
-                    console.error("Vapi create error:", errText);
-                    return NextResponse.json({ error: `Vapi error: ${errText}` }, { status: 400 });
-                }
-
-                const assistant = await createRes.json();
-
-                // Step 2: Update assistant with tools (PATCH request)
-                const tools = getToolsConfig(serverUrl);
-
-                const updateRes = await fetch(`${VAPI_API_URL}/assistant/${assistant.id}`, {
-                    method: "PATCH",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${provider.api_key_private}`,
-                    },
-                    body: JSON.stringify({
-                        model: {
-                            ...assistantConfig.model,
-                            tools: tools,
-                        },
-                    }),
-                });
-
-                if (!updateRes.ok) {
-                    const errText = await updateRes.text();
-                    console.error("Vapi update tools error:", errText);
-                    // Assistant created but tools failed — still save
-                }
-
-                // Step 3: Save assistant ID
-                await supabase
-                    .from("credit_providers")
-                    .update({ assistant_id: assistant.id, last_checked_at: new Date().toISOString() })
-                    .eq("id", providerId);
+                const result = await cloneToAccount(provider);
 
                 return NextResponse.json({
                     success: true,
-                    assistantId: assistant.id,
-                    message: `Riley cloned to ${provider.account_email}!`,
+                    assistantId: result.assistantId,
+                    toolsCreated: result.toolsCreated,
+                    totalTools: result.totalTools,
+                    toolResults: result.toolResults,
+                    account: provider.account_email,
+                    message: `✅ Riley cloned! ${result.toolsCreated}/${result.totalTools} tools created on ${provider.account_email}`,
                 });
             }
 
             case "clone_to_all": {
-                const { data: providers } = await supabase
-                    .from("credit_providers")
-                    .select("*")
-                    .eq("is_active", true)
-                    .not("api_key_private", "is", null);
+                const { data: providers } = await supabase.from("credit_providers").select("*").eq("is_active", true).not("api_key_private", "is", null);
+                if (!providers?.length) return NextResponse.json({ error: "No accounts with private keys" }, { status: 400 });
 
-                if (!providers?.length) {
-                    return NextResponse.json({ error: "No accounts with private keys" }, { status: 400 });
-                }
-
-                const serverUrl = N8N_WEBHOOK_URL;
-                const assistantConfig = getRileyConfig(serverUrl);
-                const tools = getToolsConfig(serverUrl);
-                const results = [];
-
+                const results: any[] = [];
                 for (const provider of providers) {
+                    if (provider.assistant_id) {
+                        results.push({ email: provider.account_email, status: "skipped", reason: "Already cloned" });
+                        continue;
+                    }
                     try {
-                        // Skip if already cloned
-                        if (provider.assistant_id) {
-                            results.push({ email: provider.account_email, status: "skipped", message: "Already cloned" });
-                            continue;
-                        }
-
-                        // Create assistant
-                        const createRes = await fetch(`${VAPI_API_URL}/assistant`, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "Authorization": `Bearer ${provider.api_key_private}`,
-                            },
-                            body: JSON.stringify(assistantConfig),
-                        });
-
-                        if (!createRes.ok) {
-                            const err = await createRes.text();
-                            results.push({ email: provider.account_email, status: "failed", error: err });
-                            continue;
-                        }
-
-                        const assistant = await createRes.json();
-
-                        // Add tools
-                        await fetch(`${VAPI_API_URL}/assistant/${assistant.id}`, {
-                            method: "PATCH",
-                            headers: {
-                                "Content-Type": "application/json",
-                                "Authorization": `Bearer ${provider.api_key_private}`,
-                            },
-                            body: JSON.stringify({ model: { ...assistantConfig.model, tools } }),
-                        });
-
-                        // Save
-                        await supabase
-                            .from("credit_providers")
-                            .update({ assistant_id: assistant.id, last_checked_at: new Date().toISOString() })
-                            .eq("id", provider.id);
-
-                        results.push({ email: provider.account_email, status: "success", assistantId: assistant.id });
+                        const result = await cloneToAccount(provider);
+                        results.push({ email: provider.account_email, status: "success", assistantId: result.assistantId, toolsCreated: result.toolsCreated });
                     } catch (e: any) {
                         results.push({ email: provider.account_email, status: "failed", error: e.message });
                     }
                 }
 
-                const successCount = results.filter((r) => r.status === "success").length;
-                return NextResponse.json({ success: true, results, message: `Cloned to ${successCount} accounts` });
+                const success = results.filter((r) => r.status === "success").length;
+                return NextResponse.json({ success: true, results, message: `✅ Cloned ${success} accounts!` });
+            }
+
+            case "reclone_account": {
+                const { providerId } = body;
+                const { data: provider } = await supabase.from("credit_providers").select("*").eq("id", providerId).single();
+                if (!provider?.api_key_private) return NextResponse.json({ error: "Missing private key" }, { status: 400 });
+
+                // Delete old assistant and its tools
+                if (provider.assistant_id) {
+                    try {
+                        // Get old assistant to find toolIds
+                        const oldRes = await fetch(`${VAPI_API_URL}/assistant/${provider.assistant_id}`, { headers: { "Authorization": `Bearer ${provider.api_key_private}` } });
+                        if (oldRes.ok) {
+                            const oldAssistant = await oldRes.json();
+                            const oldToolIds = oldAssistant.model?.toolIds || [];
+                            // Delete old tools
+                            for (const toolId of oldToolIds) {
+                                try { await fetch(`${VAPI_API_URL}/tool/${toolId}`, { method: "DELETE", headers: { "Authorization": `Bearer ${provider.api_key_private}` } }); } catch { }
+                            }
+                        }
+                        // Delete old assistant
+                        await fetch(`${VAPI_API_URL}/assistant/${provider.assistant_id}`, { method: "DELETE", headers: { "Authorization": `Bearer ${provider.api_key_private}` } });
+                    } catch { }
+                    await supabase.from("credit_providers").update({ assistant_id: null }).eq("id", providerId);
+                }
+
+                const result = await cloneToAccount(provider);
+                return NextResponse.json({ success: true, assistantId: result.assistantId, toolsCreated: result.toolsCreated, message: `♻️ Re-cloned! ${result.toolsCreated}/16 tools + Riley created!` });
             }
 
             default:
                 return NextResponse.json({ error: "Invalid action" }, { status: 400 });
         }
     } catch (error: any) {
+        console.error("Clone error:", error);
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }
