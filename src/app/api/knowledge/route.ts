@@ -1,148 +1,133 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { auth } from "@/lib/auth";
 
-const CLIENT_ID = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
-
-// GET — Fetch all knowledge base entries
-export async function GET(req: NextRequest) {
-    try {
-        const session = await auth();
-        if (!session?.user) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
-
-        const url = new URL(req.url);
-        const category = url.searchParams.get("category");
-        const search = url.searchParams.get("search");
-
-        let query = supabase
-            .from("knowledge_base")
-            .select("*")
-            .eq("client_id", CLIENT_ID)
-            .order("category", { ascending: true })
-            .order("created_at", { ascending: false });
-
-        if (category && category !== "all") {
-            query = query.eq("category", category);
-        }
-
-        if (search) {
-            query = query.or(`title.ilike.%${search}%,content.ilike.%${search}%`);
-        }
-
-        const { data, error } = await query;
-
-        if (error) throw error;
-
-        return NextResponse.json({ entries: data || [] });
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-}
-
-// POST — Create new entry
+/**
+ * PUBLIC API — n8n calls this to get knowledge for the AI agent
+ * No auth required — called by n8n webhook workflow
+ *
+ * POST /api/agent/knowledge
+ * Body: { query: "fee structure", category: "fees" }
+ * Returns: formatted text for AI to read
+ */
 export async function POST(req: NextRequest) {
     try {
-        const session = await auth();
-        if (!session?.user) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
-
         const body = await req.json();
-        const { title, content, content_type, category } = body;
+        const { query, category, client_id } = body;
 
-        if (!title || !content) {
-            return NextResponse.json(
-                { error: "Title and content are required" },
-                { status: 400 }
-            );
+        const targetClientId =
+            client_id || "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
+
+        // Strategy 1: If category is provided, get all entries in that category
+        if (category) {
+            const { data, error } = await supabase
+                .from("knowledge_base")
+                .select("title, content, category")
+                .eq("client_id", targetClientId)
+                .eq("is_active", true)
+                .eq("category", category)
+                .order("created_at", { ascending: false })
+                .limit(5);
+
+            if (error) throw error;
+
+            if (data && data.length > 0) {
+                const formatted = data
+                    .map((e) => `## ${e.title}\n${e.content}`)
+                    .join("\n\n---\n\n");
+
+                return NextResponse.json({
+                    found: true,
+                    count: data.length,
+                    knowledge: formatted,
+                });
+            }
         }
 
-        const { data, error } = await supabase
+        // Strategy 2: Search by keywords from query
+        if (query) {
+            const keywords = query
+                .toLowerCase()
+                .replace(/[^a-z0-9\s]/g, "")
+                .split(/\s+/)
+                .filter((w: string) => w.length > 2)
+                .slice(0, 5); // Max 5 keywords
+
+            if (keywords.length > 0) {
+                // Build OR conditions for each keyword
+                const conditions = keywords
+                    .map((k: string) => `title.ilike.%${k}%,content.ilike.%${k}%`)
+                    .join(",");
+
+                const { data, error } = await supabase
+                    .from("knowledge_base")
+                    .select("title, content, category")
+                    .eq("client_id", targetClientId)
+                    .eq("is_active", true)
+                    .or(conditions)
+                    .limit(5);
+
+                if (error) throw error;
+
+                if (data && data.length > 0) {
+                    const formatted = data
+                        .map((e) => `## ${e.title}\n${e.content}`)
+                        .join("\n\n---\n\n");
+
+                    return NextResponse.json({
+                        found: true,
+                        count: data.length,
+                        knowledge: formatted,
+                    });
+                }
+            }
+        }
+
+        // Strategy 3: If nothing found, return ALL active knowledge
+        const { data: allData, error: allError } = await supabase
             .from("knowledge_base")
-            .insert({
-                client_id: CLIENT_ID,
-                title,
-                content,
-                content_type: content_type || "text",
-                category: category || "general",
-                created_by: session.user.id,
-            })
-            .select()
-            .single();
+            .select("title, content, category")
+            .eq("client_id", targetClientId)
+            .eq("is_active", true)
+            .order("category", { ascending: true })
+            .limit(10);
 
-        if (error) throw error;
+        if (allError) throw allError;
 
-        return NextResponse.json({ entry: data });
+        const formatted = (allData || [])
+            .map((e) => `## ${e.title}\n${e.content}`)
+            .join("\n\n---\n\n");
+
+        return NextResponse.json({
+            found: (allData?.length || 0) > 0,
+            count: allData?.length || 0,
+            knowledge: formatted || "No knowledge base entries found.",
+        });
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error("Knowledge API error:", error);
+        return NextResponse.json(
+            {
+                found: false,
+                count: 0,
+                knowledge:
+                    "Knowledge base temporarily unavailable. Please answer from your general knowledge about Superior University, Lahore.",
+            },
+            { status: 500 }
+        );
     }
 }
 
-// PUT — Update entry
-export async function PUT(req: NextRequest) {
-    try {
-        const session = await auth();
-        if (!session?.user) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
+// Also support GET for testing
+export async function GET() {
+    const { data, error } = await supabase
+        .from("knowledge_base")
+        .select("id, title, category, is_active, created_at")
+        .eq("client_id", "a1b2c3d4-e5f6-7890-abcd-ef1234567890")
+        .eq("is_active", true)
+        .order("category", { ascending: true });
 
-        const body = await req.json();
-        const { id, title, content, content_type, category, is_active } = body;
-
-        if (!id) {
-            return NextResponse.json({ error: "ID is required" }, { status: 400 });
-        }
-
-        const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
-        if (title !== undefined) updates.title = title;
-        if (content !== undefined) updates.content = content;
-        if (content_type !== undefined) updates.content_type = content_type;
-        if (category !== undefined) updates.category = category;
-        if (is_active !== undefined) updates.is_active = is_active;
-
-        const { data, error } = await supabase
-            .from("knowledge_base")
-            .update(updates)
-            .eq("id", id)
-            .eq("client_id", CLIENT_ID)
-            .select()
-            .single();
-
-        if (error) throw error;
-
-        return NextResponse.json({ entry: data });
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-}
-
-// DELETE — Remove entry
-export async function DELETE(req: NextRequest) {
-    try {
-        const session = await auth();
-        if (!session?.user) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
-
-        const url = new URL(req.url);
-        const id = url.searchParams.get("id");
-
-        if (!id) {
-            return NextResponse.json({ error: "ID is required" }, { status: 400 });
-        }
-
-        const { error } = await supabase
-            .from("knowledge_base")
-            .delete()
-            .eq("id", id)
-            .eq("client_id", CLIENT_ID);
-
-        if (error) throw error;
-
-        return NextResponse.json({ success: true });
-    } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
-    }
+    return NextResponse.json({
+        total: data?.length || 0,
+        entries: data || [],
+        error: error?.message || null,
+    });
 }

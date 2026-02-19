@@ -277,7 +277,7 @@ export default function KnowledgeBasePage() {
                         placeholder="Search knowledge base..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-11 pr-4 py-3 rounded-xl glass bg-white/[0.02] border border-white/10 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-violet-500/50 transition-colors"
+                        className="w-full pl-11 pr-4 py-3 rounded-xl glass bg-gray-50/50 border border-border text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-violet-500/50 transition-colors"
                     />
                 </div>
 
@@ -289,7 +289,7 @@ export default function KnowledgeBasePage() {
                             onClick={() => setActiveCategory(cat.value)}
                             className={`flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-medium whitespace-nowrap transition-all ${activeCategory === cat.value
                                 ? "bg-violet-500/20 text-violet-400 border border-violet-500/30"
-                                : "bg-white/[0.02] text-muted-foreground hover:bg-white/5 border border-transparent"
+                                : "bg-gray-50/50 text-muted-foreground hover:bg-gray-100/20 border border-transparent"
                                 }`}
                         >
                             <cat.icon className="w-3.5 h-3.5" />
@@ -327,7 +327,7 @@ export default function KnowledgeBasePage() {
                                         value={formTitle}
                                         onChange={(e) => setFormTitle(e.target.value)}
                                         placeholder="e.g. Admission Process"
-                                        className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-sm focus:outline-none focus:border-violet-500/50"
+                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50/50 border border-border text-sm focus:outline-none focus:border-violet-500/50"
                                     />
                                 </div>
                                 <div className="grid grid-cols-2 gap-3">
@@ -336,7 +336,7 @@ export default function KnowledgeBasePage() {
                                         <select
                                             value={formCategory}
                                             onChange={(e) => setFormCategory(e.target.value)}
-                                            className="w-full px-3 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-sm focus:outline-none focus:border-violet-500/50 appearance-none"
+                                            className="w-full px-3 py-2.5 rounded-xl bg-gray-50/50 border border-border text-sm focus:outline-none focus:border-violet-500/50 appearance-none"
                                         >
                                             {categories.filter((c) => c.value !== "all").map((cat) => (
                                                 <option key={cat.value} value={cat.value} className="bg-gray-900">
@@ -350,7 +350,7 @@ export default function KnowledgeBasePage() {
                                         <select
                                             value={formContentType}
                                             onChange={(e) => setFormContentType(e.target.value)}
-                                            className="w-full px-3 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-sm focus:outline-none focus:border-violet-500/50 appearance-none"
+                                            className="w-full px-3 py-2.5 rounded-xl bg-gray-50/50 border border-border text-sm focus:outline-none focus:border-violet-500/50 appearance-none"
                                         >
                                             {contentTypes.map((ct) => (
                                                 <option key={ct.value} value={ct.value} className="bg-gray-900">
@@ -371,7 +371,7 @@ export default function KnowledgeBasePage() {
                                     onChange={(e) => setFormContent(e.target.value)}
                                     placeholder="Write detailed information here. The more detail you provide, the better the AI can answer questions about this topic..."
                                     rows={8}
-                                    className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-sm focus:outline-none focus:border-violet-500/50 resize-y leading-relaxed"
+                                    className="w-full px-4 py-3 rounded-xl bg-gray-50/50 border border-border text-sm focus:outline-none focus:border-violet-500/50 resize-y leading-relaxed"
                                 />
                             </div>
 
@@ -434,13 +434,13 @@ export default function KnowledgeBasePage() {
                                             type="text"
                                             value={formTitle}
                                             onChange={(e) => setFormTitle(e.target.value)}
-                                            className="px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-sm focus:outline-none focus:border-violet-500/50"
+                                            className="px-4 py-2.5 rounded-xl bg-gray-50 border border-border text-sm focus:outline-none focus:border-violet-500/50"
                                         />
                                         <div className="grid grid-cols-2 gap-3">
                                             <select
                                                 value={formCategory}
                                                 onChange={(e) => setFormCategory(e.target.value)}
-                                                className="px-3 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-sm focus:outline-none appearance-none"
+                                                className="px-3 py-2.5 rounded-xl bg-white/[0.03] border border-border text-sm focus:outline-none appearance-none"
                                             >
                                                 {categories.filter((c) => c.value !== "all").map((cat) => (
                                                     <option key={cat.value} value={cat.value} className="bg-gray-900">
@@ -451,7 +451,7 @@ export default function KnowledgeBasePage() {
                                             <select
                                                 value={formContentType}
                                                 onChange={(e) => setFormContentType(e.target.value)}
-                                                className="px-3 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-sm focus:outline-none appearance-none"
+                                                className="px-3 py-2.5 rounded-xl bg-white/[0.03] border border-border text-sm focus:outline-none appearance-none"
                                             >
                                                 {contentTypes.map((ct) => (
                                                     <option key={ct.value} value={ct.value} className="bg-gray-900">
@@ -465,7 +465,7 @@ export default function KnowledgeBasePage() {
                                         value={formContent}
                                         onChange={(e) => setFormContent(e.target.value)}
                                         rows={8}
-                                        className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-sm focus:outline-none focus:border-violet-500/50 resize-y mb-4 leading-relaxed"
+                                        className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-border text-sm focus:outline-none focus:border-violet-500/50 resize-y mb-4 leading-relaxed"
                                     />
                                     <div className="flex justify-end gap-3">
                                         <button
@@ -494,7 +494,7 @@ export default function KnowledgeBasePage() {
                                                 <span className="px-2 py-0.5 rounded-md bg-violet-500/10 text-violet-400 text-[10px] font-semibold uppercase tracking-wider">
                                                     {entry.category}
                                                 </span>
-                                                <span className="px-2 py-0.5 rounded-md bg-white/5 text-muted-foreground text-[10px] uppercase tracking-wider">
+                                                <span className="px-2 py-0.5 rounded-md bg-gray-100 text-muted-foreground text-[10px] uppercase tracking-wider">
                                                     {entry.content_type}
                                                 </span>
                                             </div>
@@ -504,7 +504,7 @@ export default function KnowledgeBasePage() {
                                             {/* Toggle active */}
                                             <button
                                                 onClick={() => handleToggleActive(entry)}
-                                                className="w-9 h-9 rounded-lg hover:bg-white/5 flex items-center justify-center transition-colors"
+                                                className="w-9 h-9 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors"
                                                 title={entry.is_active ? "Deactivate" : "Activate"}
                                             >
                                                 {entry.is_active ? (
@@ -516,7 +516,7 @@ export default function KnowledgeBasePage() {
                                             {/* Edit */}
                                             <button
                                                 onClick={() => startEdit(entry)}
-                                                className="w-9 h-9 rounded-lg hover:bg-white/5 flex items-center justify-center text-muted-foreground hover:text-violet-400 transition-colors"
+                                                className="w-9 h-9 rounded-lg hover:bg-gray-100 flex items-center justify-center text-muted-foreground hover:text-violet-400 transition-colors"
                                             >
                                                 <Edit3 className="w-4 h-4" />
                                             </button>
