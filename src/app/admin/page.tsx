@@ -229,15 +229,30 @@ export default function AdminDashboard() {
                                 </div>
                             </div>
                         )}
-
                         {/* PROVIDERS TAB */}
                         {activeTab === "providers" && (
                             <div className="space-y-4">
-                                <div className="flex items-center justify-between">
+                                <div className="flex items-center justify-between flex-wrap gap-3">
                                     <h3 className="font-heading font-bold">Voice Provider Accounts</h3>
-                                    <button onClick={() => setShowAddProvider(!showAddProvider)} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-semibold shadow-lg shadow-violet-500/20">
-                                        <Plus className="w-4 h-4" />Add Account
-                                    </button>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={async () => {
+                                                if (!confirm("Clone Riley agent to ALL accounts? This will create a new assistant on each account.")) return;
+                                                setLoading(true);
+                                                const res = await fetch("/api/admin/vapi-clone", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "clone_to_all" }) });
+                                                const data = await res.json();
+                                                alert(data.success ? `Cloned to ${data.results.filter((r: any) => r.status === "success").length} accounts!` : data.error);
+                                                setLoading(false);
+                                                fetchData("providers");
+                                            }}
+                                            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-semibold shadow-lg shadow-emerald-500/20"
+                                        >
+                                            <RefreshCw className="w-4 h-4" />Clone Riley to All
+                                        </button>
+                                        <button onClick={() => setShowAddProvider(!showAddProvider)} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-semibold shadow-lg shadow-violet-500/20">
+                                            <Plus className="w-4 h-4" />Add Account
+                                        </button>
+                                    </div>
                                 </div>
 
                                 {showAddProvider && (
@@ -249,9 +264,9 @@ export default function AdminDashboard() {
                                                 <option value="retell">Retell AI</option>
                                                 <option value="bland">Bland AI</option>
                                             </select>
-                                            <input type="email" placeholder="Account email" value={newProvider.account_email} onChange={(e) => setNewProvider({ ...newProvider, account_email: e.target.value })} className="px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm" />
+                                            <input type="email" placeholder="Account email (e.g. mhabdullah000+vapi1@gmail.com)" value={newProvider.account_email} onChange={(e) => setNewProvider({ ...newProvider, account_email: e.target.value })} className="px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm" />
                                             <input type="text" placeholder="Public API Key" value={newProvider.api_key_public} onChange={(e) => setNewProvider({ ...newProvider, api_key_public: e.target.value })} className="px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm" />
-                                            <input type="password" placeholder="Private API Key" value={newProvider.api_key_private} onChange={(e) => setNewProvider({ ...newProvider, api_key_private: e.target.value })} className="px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm" />
+                                            <input type="text" placeholder="Private API Key (required for cloning)" value={newProvider.api_key_private} onChange={(e) => setNewProvider({ ...newProvider, api_key_private: e.target.value })} className="px-3 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm" />
                                         </div>
                                         <div className="flex gap-3">
                                             <button onClick={handleAddProvider} className="px-5 py-2 rounded-xl bg-emerald-600 text-white text-sm font-semibold">Save Account</button>
@@ -262,37 +277,59 @@ export default function AdminDashboard() {
 
                                 <div className="space-y-3">
                                     {providers.map((p) => (
-                                        <div key={p.id} className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm flex items-center gap-4">
-                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${p.credits_remaining > 2 ? "bg-emerald-50 text-emerald-600" : p.credits_remaining > 0 ? "bg-amber-50 text-amber-600" : "bg-red-50 text-red-600"}`}>
-                                                <Server className="w-6 h-6" />
-                                            </div>
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-sm font-bold uppercase">{p.provider}</span>
-                                                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${p.is_active ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>{p.is_active ? "Active" : "Inactive"}</span>
+                                        <div key={p.id} className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+                                            <div className="flex items-center gap-4">
+                                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${p.credits_remaining > 2 ? "bg-emerald-50 text-emerald-600" : p.credits_remaining > 0 ? "bg-amber-50 text-amber-600" : "bg-red-50 text-red-600"}`}>
+                                                    <Server className="w-6 h-6" />
                                                 </div>
-                                                <p className="text-xs text-muted-foreground">{p.account_email}</p>
-                                                <p className="text-xs text-muted-foreground mt-0.5">Key: {p.api_key_public?.substring(0, 15)}...</p>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                        <span className="text-sm font-bold uppercase">{p.provider}</span>
+                                                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${p.is_active ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}`}>{p.is_active ? "Active" : "Inactive"}</span>
+                                                        {(p as any).assistant_id && <span className="text-[10px] px-2 py-0.5 rounded-full bg-violet-100 text-violet-700 font-semibold">Riley Cloned ✓</span>}
+                                                    </div>
+                                                    <p className="text-xs text-muted-foreground truncate">{p.account_email}</p>
+                                                    <p className="text-xs text-muted-foreground mt-0.5">Key: {p.api_key_public?.substring(0, 20)}...</p>
+                                                    {(p as any).assistant_id && <p className="text-[10px] text-violet-500 mt-0.5">Assistant: {(p as any).assistant_id.substring(0, 20)}...</p>}
+                                                </div>
+                                                <div className="text-right shrink-0">
+                                                    <p className={`text-xl font-heading font-bold ${p.credits_remaining > 2 ? "text-emerald-600" : p.credits_remaining > 0 ? "text-amber-600" : "text-red-600"}`}>${p.credits_remaining}</p>
+                                                    <p className="text-[10px] text-muted-foreground">credits</p>
+                                                </div>
                                             </div>
-                                            <div className="text-right">
-                                                <p className={`text-xl font-heading font-bold ${p.credits_remaining > 2 ? "text-emerald-600" : p.credits_remaining > 0 ? "text-amber-600" : "text-red-600"}`}>${p.credits_remaining}</p>
-                                                <p className="text-[10px] text-muted-foreground">credits left</p>
+                                            <div className="flex items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+                                                {!(p as any).assistant_id && (
+                                                    <button
+                                                        onClick={async () => {
+                                                            setLoading(true);
+                                                            const res = await fetch("/api/admin/vapi-clone", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "clone_to_account", providerId: p.id }) });
+                                                            const data = await res.json();
+                                                            alert(data.success ? `Riley cloned! Assistant ID: ${data.assistantId}` : data.error);
+                                                            setLoading(false);
+                                                            fetchData("providers");
+                                                        }}
+                                                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-50 text-violet-700 text-xs font-semibold hover:bg-violet-100 transition-colors"
+                                                    >
+                                                        <RefreshCw className="w-3 h-3" />Clone Riley
+                                                    </button>
+                                                )}
+                                                <button onClick={() => handleRemoveProvider(p.id)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-red-50 text-xs text-muted-foreground hover:text-red-500 transition-colors ml-auto">
+                                                    <Trash2 className="w-3 h-3" />Remove
+                                                </button>
                                             </div>
-                                            <button onClick={() => handleRemoveProvider(p.id)} className="w-9 h-9 rounded-lg hover:bg-red-50 flex items-center justify-center text-muted-foreground hover:text-red-500 transition-colors">
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
                                         </div>
                                     ))}
                                     {providers.length === 0 && (
                                         <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center shadow-sm">
                                             <Server className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                                            <p className="font-heading font-bold">No provider accounts added</p>
-                                            <p className="text-sm text-muted-foreground mt-1">Add your Vapi accounts to enable credit rotation</p>
+                                            <p className="font-heading font-bold">No provider accounts yet</p>
+                                            <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">Add your Vapi accounts here. Use the Gmail + trick to create 10 accounts, then clone Riley to all of them with one click!</p>
                                         </div>
                                     )}
                                 </div>
                             </div>
                         )}
+
                     </>
                 )}
             </div>
