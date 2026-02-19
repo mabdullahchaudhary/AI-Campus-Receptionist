@@ -1,30 +1,30 @@
 @import "tailwindcss";
 
 @theme {
-  /* Deep rich dark — NOT pure black, subtle warmth */
-  --color-background: oklch(0.12 0.01 260);
-  --color-foreground: oklch(0.95 0 0);
-  --color-card: oklch(0.16 0.01 260);
-  --color-card-foreground: oklch(0.95 0 0);
-  --color-popover: oklch(0.16 0.01 260);
-  --color-popover-foreground: oklch(0.95 0 0);
-  --color-primary: oklch(0.65 0.28 270);
-  --color-primary-foreground: oklch(0.98 0 0);
-  --color-secondary: oklch(0.22 0.01 260);
-  --color-secondary-foreground: oklch(0.95 0 0);
-  --color-muted: oklch(0.25 0.01 260);
-  --color-muted-foreground: oklch(0.55 0.01 260);
-  --color-accent: oklch(0.65 0.28 270);
-  --color-accent-foreground: oklch(0.98 0 0);
-  --color-destructive: oklch(0.55 0.2 25);
-  --color-destructive-foreground: oklch(0.98 0 0);
-  --color-border: oklch(0.22 0.01 260);
-  --color-input: oklch(0.22 0.01 260);
-  --color-ring: oklch(0.65 0.28 270);
+  /* ========== LIGHT THEME — Clean, Modern, Premium ========== */
+  --color-background: oklch(0.985 0.002 250);
+  --color-foreground: oklch(0.15 0.01 250);
+  --color-card: oklch(1 0 0);
+  --color-card-foreground: oklch(0.15 0.01 250);
+  --color-popover: oklch(1 0 0);
+  --color-popover-foreground: oklch(0.15 0.01 250);
+  --color-primary: oklch(0.55 0.24 270);
+  --color-primary-foreground: oklch(1 0 0);
+  --color-secondary: oklch(0.96 0.005 250);
+  --color-secondary-foreground: oklch(0.25 0.01 250);
+  --color-muted: oklch(0.95 0.005 250);
+  --color-muted-foreground: oklch(0.45 0.02 250);
+  --color-accent: oklch(0.55 0.24 270);
+  --color-accent-foreground: oklch(1 0 0);
+  --color-destructive: oklch(0.55 0.22 25);
+  --color-destructive-foreground: oklch(1 0 0);
+  --color-border: oklch(0.91 0.005 250);
+  --color-input: oklch(0.91 0.005 250);
+  --color-ring: oklch(0.55 0.24 270);
   --radius: 0.875rem;
 
   --font-sans: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
-  --font-heading: var(--font-cabinet), "Cabinet Grotesk", system-ui, sans-serif;
+  --font-heading: var(--font-cabinet), system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", monospace;
 }
 
@@ -49,68 +49,83 @@ body {
 }
 
 ::selection {
-  background: oklch(0.65 0.28 270 / 0.3);
-  color: white;
+  background: oklch(0.55 0.24 270 / 0.15);
+  color: oklch(0.25 0.15 270);
 }
 
 /* ========== SCROLLBAR ========== */
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: oklch(0.3 0.01 260);
+  background: oklch(0.85 0.005 250);
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: oklch(0.4 0.01 260);
+  background: oklch(0.75 0.01 250);
 }
 
-/* ========== PREMIUM UTILITIES ========== */
+/* ========== GRADIENT TEXT ========== */
 .gradient-text {
-  background: linear-gradient(135deg, #c084fc 0%, #818cf8 50%, #60a5fa 100%);
+  background: linear-gradient(135deg, #7c3aed 0%, #6366f1 40%, #3b82f6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .gradient-text-warm {
-  background: linear-gradient(135deg, #f472b6 0%, #c084fc 50%, #818cf8 100%);
+  background: linear-gradient(135deg, #ec4899 0%, #8b5cf6 50%, #6366f1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
+/* ========== SHADOWS & GLOWS ========== */
 .glow {
   box-shadow:
-    0 0 15px oklch(0.65 0.28 270 / 0.2),
-    0 0 45px oklch(0.65 0.28 270 / 0.08),
-    0 4px 20px oklch(0 0 0 / 0.4);
+    0 1px 2px oklch(0 0 0 / 0.05),
+    0 4px 16px oklch(0.55 0.24 270 / 0.15),
+    0 8px 32px oklch(0.55 0.24 270 / 0.08);
 }
 
 .glow-hover:hover {
   box-shadow:
-    0 0 20px oklch(0.65 0.28 270 / 0.25),
-    0 0 60px oklch(0.65 0.28 270 / 0.1),
-    0 8px 30px oklch(0 0 0 / 0.5);
+    0 1px 2px oklch(0 0 0 / 0.05),
+    0 8px 24px oklch(0.55 0.24 270 / 0.12),
+    0 16px 48px oklch(0.55 0.24 270 / 0.06);
 }
 
+.shadow-soft {
+  box-shadow:
+    0 1px 3px oklch(0 0 0 / 0.04),
+    0 4px 12px oklch(0 0 0 / 0.03);
+}
+
+.shadow-medium {
+  box-shadow:
+    0 2px 4px oklch(0 0 0 / 0.04),
+    0 8px 24px oklch(0 0 0 / 0.06);
+}
+
+/* ========== GLASS (Light version) ========== */
 .glass {
-  background: oklch(0.15 0.01 260 / 0.6);
+  background: oklch(1 0 0 / 0.7);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid oklch(1 0 0 / 0.06);
+  border: 1px solid oklch(0 0 0 / 0.06);
 }
 
 .glass-strong {
-  background: oklch(0.15 0.01 260 / 0.8);
+  background: oklch(1 0 0 / 0.85);
   backdrop-filter: blur(40px) saturate(200%);
   -webkit-backdrop-filter: blur(40px) saturate(200%);
-  border: 1px solid oklch(1 0 0 / 0.08);
+  border: 1px solid oklch(0 0 0 / 0.08);
 }
 
+/* ========== CARD EFFECTS ========== */
 .card-shine {
   position: relative;
   overflow: hidden;
@@ -126,7 +141,7 @@ body {
   background: linear-gradient(
     90deg,
     transparent,
-    oklch(1 0 0 / 0.03),
+    oklch(1 0 0 / 0.4),
     transparent
   );
   transition: left 0.6s ease;
@@ -136,13 +151,13 @@ body {
   left: 100%;
 }
 
-/* ========== NOISE TEXTURE ========== */
+/* ========== NOISE TEXTURE (subtle for light) ========== */
 .noise::after {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 9999;
   pointer-events: none;
-  opacity: 0.015;
+  opacity: 0.008;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
