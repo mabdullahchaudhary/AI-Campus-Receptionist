@@ -1,3 +1,4 @@
+import { VAPI_PUBLIC_KEY, VAPI_ASSISTANT_ID } from "@/lib/config";
 export type ProviderType = "vapi" | "browser";
 
 export type CallStatus =
@@ -202,12 +203,12 @@ class VoiceProviderManager {
     }
 
     private async connectVapi(config: CallConfig): Promise<void> {
-        const publicKey = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY;
+        const publicKey = VAPI_PUBLIC_KEY;
         if (!publicKey) {
             throw new Error("NEXT_PUBLIC_VAPI_PUBLIC_KEY is not set in .env.local");
         }
 
-        const assistantId = config.assistantId;
+        const assistantId = config.assistantId || VAPI_ASSISTANT_ID;
         if (!assistantId) {
             throw new Error("NEXT_PUBLIC_VAPI_ASSISTANT_ID is not set in .env.local");
         }

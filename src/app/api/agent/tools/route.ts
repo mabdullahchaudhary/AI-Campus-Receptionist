@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { DEFAULT_CLIENT_ID } from "@/lib/config";
 
-const CLIENT_ID = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
+const CLIENT_ID = DEFAULT_CLIENT_ID;
 
 async function searchKnowledge(query: string, category?: string): Promise<string> {
     try {
