@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { auth } from "@/lib/auth";
-
-const CLIENT_ID = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
+import { DEFAULT_CLIENT_ID } from "@/lib/config";
 
 export async function GET(req: NextRequest) {
     try {
@@ -13,7 +12,7 @@ export async function GET(req: NextRequest) {
         const category = url.searchParams.get("category");
         const search = url.searchParams.get("search");
 
-        let query = supabase.from("knowledge_base").select("*").eq("client_id", CLIENT_ID).order("category").order("created_at", { ascending: false });
+        let query = supabase.from("knowledge_base").select("*").eq("client_id", DEFAULT_CLIENT_ID).order("category").order("created_at", { ascending: false });
 
         if (category && category !== "all") query = query.eq("category", category);
         if (search) query = query.or(`title.ilike.%${search}%,content.ilike.%${search}%`);
@@ -36,7 +35,7 @@ export async function POST(req: NextRequest) {
         if (!body.title || !body.content) return NextResponse.json({ error: "Title and content required" }, { status: 400 });
 
         const { data, error } = await supabase.from("knowledge_base").insert({
-            client_id: CLIENT_ID,
+            client_id: DEFAULT_CLIENT_ID,
             title: body.title,
             content: body.content,
             content_type: body.content_type || "text",
@@ -66,7 +65,7 @@ export async function PUT(req: NextRequest) {
         if (body.category !== undefined) updates.category = body.category;
         if (body.is_active !== undefined) updates.is_active = body.is_active;
 
-        const { data, error } = await supabase.from("knowledge_base").update(updates).eq("id", body.id).eq("client_id", CLIENT_ID).select().single();
+        const { data, error } = await supabase.from("knowledge_base").update(updates).eq("id", body.id).eq("client_id", DEFAULT_CLIENT_ID).select().single();
         if (error) throw error;
         return NextResponse.json({ entry: data });
     } catch (error: any) {
@@ -83,7 +82,7 @@ export async function DELETE(req: NextRequest) {
         const id = url.searchParams.get("id");
         if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
 
-        const { error } = await supabase.from("knowledge_base").delete().eq("id", id).eq("client_id", CLIENT_ID);
+        const { error } = await supabase.from("knowledge_base").delete().eq("id", id).eq("client_id", DEFAULT_CLIENT_ID);
         if (error) throw error;
         return NextResponse.json({ success: true });
     } catch (error: any) {

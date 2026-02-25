@@ -1,0 +1,43 @@
+{
+    "name": "Superior AI Receptionist",
+    "short_name": "SuperiorAI",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#fff",
+    "theme_color": "#8A2BE2",
+    "description": "AI Voice Receptionist SaaS for universities and businesses. Plug-and-play widget, built by a team of 6 engineers.",
+    "categories": [
+        "productivity",
+        "communication",
+        "ai",
+        "voice",
+        "education",
+        "business"
+    ],
+    "related_applications": [
+        {
+            "platform": "web",
+            "url": "https://superior.edu.pk"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/screenshot1.png",
+            "sizes": "1280x720",
+            "type": "image/png"
+        }
+    ],
+    "developer": {
+        "name": "Superior AI Team (6 engineers)",
+        "url": "https://superior.edu.pk/team"
+    },
+    "lang": "en",
+    "dir": "ltr",
+    "icons": [
+        {
+            "src": "/favicon.ico",
+            "sizes": "64x64 32x32 24x24 16x16",
+            "type": "image/x-icon"
+        }
+    ]
+}

@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { DEFAULT_CLIENT_ID } from "@/lib/config";
 
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
         const { query, category, client_id } = body;
 
-        const targetClientId = client_id || "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
+        // Allow callers to specify a tenant; fall back to the default demo tenant
+        const targetClientId = client_id || DEFAULT_CLIENT_ID;
 
         if (category) {
             const { data, error } = await supabase
@@ -86,7 +88,7 @@ export async function GET() {
     const { data, error } = await supabase
         .from("knowledge_base")
         .select("id, title, category, is_active")
-        .eq("client_id", "a1b2c3d4-e5f6-7890-abcd-ef1234567890")
+        .eq("client_id", DEFAULT_CLIENT_ID)
         .eq("is_active", true)
         .order("category", { ascending: true });
 

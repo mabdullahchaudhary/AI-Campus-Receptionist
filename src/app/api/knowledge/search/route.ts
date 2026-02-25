@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { DEFAULT_CLIENT_ID } from "@/lib/config";
 
-// Public API — n8n calls this to get knowledge for AI
+// Public endpoint consumed by n8n to retrieve knowledge for AI context injection
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
         const { query, client_id, category } = body;
 
-        const targetClientId = client_id || "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
+        const targetClientId = client_id || DEFAULT_CLIENT_ID;
 
         let dbQuery = supabase
             .from("knowledge_base")
@@ -19,7 +20,6 @@ export async function POST(req: NextRequest) {
             dbQuery = dbQuery.eq("category", category);
         }
 
-        // If there's a search query, filter by it
         if (query) {
             const keywords = query
                 .toLowerCase()
@@ -38,14 +38,8 @@ export async function POST(req: NextRequest) {
 
         if (error) throw error;
 
-        // Format for AI consumption
-        const knowledgeText = (data || [])
-            .map((entry) => `## ${entry.title}\n${entry.content}`)
-            .join("\n\n---\n\n");
-
         return NextResponse.json({
             results: data || [],
-            formatted: knowledgeText,
             count: data?.length || 0,
         });
     } catch (error: any) {

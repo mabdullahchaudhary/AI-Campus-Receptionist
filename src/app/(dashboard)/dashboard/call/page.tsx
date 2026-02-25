@@ -313,7 +313,7 @@ export default function CallPage() {
         await startCall({
             assistantId: process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID || "",
             userId: session?.user?.id,
-            clientId: "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+            clientId: process.env.NEXT_PUBLIC_DEFAULT_CLIENT_ID || "",
             plan,
             maxDurationSeconds: maxDuration,
         });

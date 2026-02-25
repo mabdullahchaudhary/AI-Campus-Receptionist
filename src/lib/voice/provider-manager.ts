@@ -340,7 +340,7 @@ class VoiceProviderManager {
                 this.vapiInstance.start(assistantId, {
                     metadata: {
                         client_id:
-                            config.clientId || "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+                            config.clientId || "",
                         user_id: config.userId || "anonymous",
                         plan: config.plan || "free",
                         ...(config.metadata || {}),

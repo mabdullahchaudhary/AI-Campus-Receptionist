@@ -35,16 +35,12 @@ export async function POST(req: NextRequest) {
         .update({ otp_code: otpCode, otp_expires_at: expiresAt })
         .eq("id", admin.id);
 
-      // In production, send via email. For now, return in response (dev mode)
-      // TODO: Integrate email service (Resend/SendGrid)
-      console.log(`Admin OTP for ${email}: ${otpCode}`);
+      // TODO: Integrate email delivery (Resend/SendGrid) to send otpCode
+      if (process.env.NODE_ENV === "development") {
+        console.log(`[DEV] Admin OTP for ${email}: ${otpCode}`);
+      }
 
-      return NextResponse.json({
-        success: true,
-        message: "OTP sent to your email",
-        // DEV ONLY — remove in production:
-        dev_otp: otpCode,
-      });
+      return NextResponse.json({ success: true, message: "OTP sent to your email" });
     }
 
     if (action === "verify_otp") {

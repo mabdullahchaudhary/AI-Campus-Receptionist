@@ -1,31 +1,28 @@
 /**
- * ═══════════════════════════════════════════════════════════════
- * CENTRAL CONFIGURATION — ALL API KEYS, URLs, AND SETTINGS
- * ═══════════════════════════════════════════════════════════════
- *
- * CHANGE ANY KEY OR URL HERE → CHANGES EVERYWHERE
+ * Central configuration — single source of truth for all external service
+ * integrations. All values are sourced from environment variables with no
+ * hardcoded fallbacks, forcing explicit configuration in every environment.
  */
 
 // ==================== SUPABASE ====================
-export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://ybwkohutsunvqdybptxq.supabase.co";
-export const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+export const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+export const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 // ==================== VAPI ====================
-export const VAPI_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY || "";
-export const VAPI_ASSISTANT_ID = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID || "34cd5986-2239-40b9-9762-d11d89dab004";
+export const VAPI_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPI_PUBLIC_KEY!;
+export const VAPI_ASSISTANT_ID = process.env.NEXT_PUBLIC_VAPI_ASSISTANT_ID!;
 export const VAPI_API_URL = "https://api.vapi.ai";
 
 // ==================== VAPI ASSISTANT CONFIG ====================
-// These match your EXACT Vapi dashboard settings
 export const VAPI_MODEL_CONFIG = {
-    provider: "groq" as const,          // FREE! Not OpenAI
-    model: "llama-3.1-8b-instant",      // Fast + Free on Groq
+    provider: "groq" as const,
+    model: "llama-3.1-8b-instant",
     temperature: 0.7,
 };
 
 export const VAPI_VOICE_CONFIG = {
-    provider: "vapi" as const,           // Vapi's own voices
-    voiceId: "Elliot",                   // Your selected voice
+    provider: "vapi" as const,
+    voiceId: "Elliot",
 };
 
 export const VAPI_TRANSCRIBER_CONFIG = {
@@ -35,18 +32,21 @@ export const VAPI_TRANSCRIBER_CONFIG = {
 };
 
 // ==================== N8N ====================
-export const N8N_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL || "https://superiorproject.app.n8n.cloud/webhook/ai-receptionist";
+export const N8N_WEBHOOK_URL = process.env.NEXT_PUBLIC_N8N_WEBHOOK_URL!;
 
 // ==================== APP ====================
-export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://superior-ai.vercel.app";
+export const APP_URL = process.env.NEXT_PUBLIC_APP_URL!;
 export const APP_NAME = "Superior AI";
 export const UNIVERSITY_NAME = "Superior University";
 export const UNIVERSITY_PHONE = "042-35761999";
 export const UNIVERSITY_ADDRESS = "17-KM Raiwind Road, Lahore, Pakistan";
 export const UNIVERSITY_WEBSITE = "www.superior.edu.pk";
 
-// ==================== CLIENT ====================
-export const DEFAULT_CLIENT_ID = "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
+/**
+ * Server-only: default tenant client ID for the university demo.
+ * Never use NEXT_PUBLIC_ prefix — must not be exposed to the browser.
+ */
+export const DEFAULT_CLIENT_ID = process.env.DEFAULT_CLIENT_ID!;
 
 // ==================== PLAN LIMITS ====================
 export const PLAN_LIMITS = {

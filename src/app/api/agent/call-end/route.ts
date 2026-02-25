@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { DEFAULT_CLIENT_ID } from "@/lib/config";
 
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
         const { call_id, transcript, summary, duration, caller_phone, client_id } = body;
 
-        const targetClientId = client_id || "a1b2c3d4-e5f6-7890-abcd-ef1234567890";
+        const targetClientId = client_id || DEFAULT_CLIENT_ID;
 
         // Save call log
         await supabase.from("call_logs").insert({
