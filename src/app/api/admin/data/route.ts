@@ -1,20 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-
-function verifyAdmin(req: NextRequest): { id: string; email: string; name: string } | null {
-  const token = req.cookies.get("admin_token")?.value;
-  if (!token) return null;
-  try {
-    const decoded = JSON.parse(Buffer.from(token, "base64").toString());
-    if (decoded.exp < Date.now()) return null;
-    return decoded;
-  } catch {
-    return null;
-  }
-}
+import { verifyAdminToken } from "@/features/auth/admin/token";
 
 export async function GET(req: NextRequest) {
-  const admin = verifyAdmin(req);
+  const admin = verifyAdminToken(req.cookies.get("admin_token")?.value);
   if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const url = new URL(req.url);
@@ -99,7 +88,7 @@ export async function GET(req: NextRequest) {
 
 // POST — Admin actions (change plan, block user, etc.)
 export async function POST(req: NextRequest) {
-  const admin = verifyAdmin(req);
+  const admin = verifyAdminToken(req.cookies.get("admin_token")?.value);
   if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json();
