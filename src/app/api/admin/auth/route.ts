@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { sendEmail } from "@/lib/email";
+import AdminOtpEmail from "@/components/email/AdminOtpEmail";
 
 function generateOTP(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -33,7 +34,7 @@ export async function POST(req: NextRequest) {
       await sendEmail({
         to: email,
         subject: "Your Superior AI admin login code",
-        html: `<p>Your one-time login code is <strong>${otpCode}</strong>.</p><p>This code will expire in 10 minutes.</p>`,
+        react: <AdminOtpEmail otpCode={otpCode} />,
       });
 
       return NextResponse.json({ success: true, message: "OTP sent to your email" });
