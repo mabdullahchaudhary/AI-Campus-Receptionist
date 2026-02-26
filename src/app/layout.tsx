@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import SessionProvider from "@/components/providers/SessionProvider";
 import "./globals.css";
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
 export const metadata: Metadata = {
   title: "Superior AI — Intelligent Voice Receptionist",
   description: "Enterprise AI voice agent for universities — 24/7, multilingual.",
@@ -25,34 +25,36 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="twitter:title" content="Superior AI — Intelligent Voice Receptionist" />
         <meta name="twitter:description" content="Enterprise AI voice agent for universities and businesses. 24/7, multilingual, plug-and-play widget." />
         <meta name="twitter:image" content="/og-image.png" />
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Product",
-          "name": "Superior AI Receptionist",
-          "description": "AI Voice Receptionist SaaS for universities and businesses. Plug-and-play widget, built by a team of 6 engineers.",
-          "brand": {
-            "@type": "Brand",
-            "name": "Superior AI"
-          },
-          "offers": {
-            "@type": "Offer",
-            "url": "https://superior.edu.pk",
-            "price": "Contact for pricing",
-            "priceCurrency": "USD"
-          },
-          "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": "5",
-            "reviewCount": "100"
-          },
-          "review": [
-            {
-              "@type": "Review",
-              "author": "University Admin",
-              "reviewBody": "Superior AI Receptionist transformed our campus experience!"
-            }
-          ]
-        }) }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": "Superior AI Receptionist",
+            "description": "AI Voice Receptionist SaaS for universities and businesses. Plug-and-play widget, built by a team of 6 engineers.",
+            "brand": {
+              "@type": "Brand",
+              "name": "Superior AI"
+            },
+            "offers": {
+              "@type": "Offer",
+              "url": "https://superior.edu.pk",
+              "price": "Contact for pricing",
+              "priceCurrency": "USD"
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "5",
+              "reviewCount": "100"
+            },
+            "review": [
+              {
+                "@type": "Review",
+                "author": "University Admin",
+                "reviewBody": "Superior AI Receptionist transformed our campus experience!"
+              }
+            ]
+          })
+        }} />
       </head>
       <body suppressHydrationWarning className="font-sans min-h-screen noise antialiased">
         <SessionProvider>{children}</SessionProvider>
