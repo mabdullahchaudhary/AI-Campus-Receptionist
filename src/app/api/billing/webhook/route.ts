@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { errorRedirect } from "@/lib/error-redirect";
 import { constructWebhookEvent, handleCheckoutCompleted } from "@/features/billing/stripe";
 
 export const dynamic = "force-dynamic";
@@ -8,14 +9,14 @@ export async function POST(req: NextRequest) {
     const signature = req.headers.get("stripe-signature");
     if (!signature) {
         console.log("[Webhook] Missing stripe-signature header");
-        return NextResponse.json({ error: "Missing stripe-signature" }, { status: 400 });
+        return errorRedirect(req, 400, "Missing stripe-signature");
     }
     let rawBody: string;
     try {
         rawBody = await req.text();
     } catch (e) {
         console.error("[Webhook] Failed to read body", e);
-        return NextResponse.json({ error: "Invalid body" }, { status: 400 });
+        return errorRedirect(req, 400, "Invalid body");
     }
     let event;
     try {
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
     } catch (e: unknown) {
         const message = e instanceof Error ? e.message : "Webhook signature verification failed";
         console.error("[Webhook] Signature verification failed", e);
-        return NextResponse.json({ error: message }, { status: 400 });
+        return errorRedirect(req, 400, message);
     }
     console.log("[Webhook] Event type: " + event.type);
     if (event.type === "checkout.session.completed") {
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
                 console.log("[Webhook] handleCheckoutCompleted finished");
             } catch (e) {
                 console.error("[Webhook] handleCheckoutCompleted error", e);
-                return NextResponse.json({ error: "Processing failed" }, { status: 500 });
+                return errorRedirect(req, 500, "Processing failed");
             }
         }
     }

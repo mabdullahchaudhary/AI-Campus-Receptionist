@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { errorRedirect } from "@/lib/error-redirect";
 import { auth } from "@/lib/auth";
 import {
     getKnowledgeEntries,
@@ -10,7 +11,7 @@ import {
 export async function GET(req: NextRequest) {
     try {
         const session = await auth();
-        if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        if (!session?.user) return errorRedirect(req, 401, "Unauthorized");
 
         const url = new URL(req.url);
         const category = url.searchParams.get("category");
@@ -23,17 +24,17 @@ export async function GET(req: NextRequest) {
 
         return NextResponse.json({ entries });
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return errorRedirect(req, 500, error.message);
     }
 }
 
 export async function POST(req: NextRequest) {
     try {
         const session = await auth();
-        if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        if (!session?.user) return errorRedirect(req, 401, "Unauthorized");
 
         const body = await req.json();
-        if (!body.title || !body.content) return NextResponse.json({ error: "Title and content required" }, { status: 400 });
+        if (!body.title || !body.content) return errorRedirect(req, 400, "Title and content required");
 
         const entry = await createKnowledgeEntry({
             title: body.title,
@@ -45,17 +46,17 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({ entry });
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return errorRedirect(req, 500, error.message);
     }
 }
 
 export async function PUT(req: NextRequest) {
     try {
         const session = await auth();
-        if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        if (!session?.user) return errorRedirect(req, 401, "Unauthorized");
 
         const body = await req.json();
-        if (!body.id) return NextResponse.json({ error: "ID required" }, { status: 400 });
+        if (!body.id) return errorRedirect(req, 400, "ID required");
 
         const entry = await updateKnowledgeEntry({
             id: body.id,
@@ -68,22 +69,22 @@ export async function PUT(req: NextRequest) {
 
         return NextResponse.json({ entry });
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return errorRedirect(req, 500, error.message);
     }
 }
 
 export async function DELETE(req: NextRequest) {
     try {
         const session = await auth();
-        if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        if (!session?.user) return errorRedirect(req, 401, "Unauthorized");
 
         const url = new URL(req.url);
         const id = url.searchParams.get("id");
-        if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
+        if (!id) return errorRedirect(req, 400, "ID required");
 
         await deleteKnowledgeEntry(id);
         return NextResponse.json({ success: true });
     } catch (error: any) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return errorRedirect(req, 500, error.message);
     }
 }

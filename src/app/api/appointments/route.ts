@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { errorRedirect } from "@/lib/error-redirect";
 import { supabase } from "@/lib/supabase";
 import { auth } from "@/lib/auth";
 import { DEFAULT_CLIENT_ID } from "@/lib/config";
@@ -6,7 +7,7 @@ import { DEFAULT_CLIENT_ID } from "@/lib/config";
 export async function GET() {
     try {
         const session = await auth();
-        if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        if (!session?.user) return errorRedirect({ headers: { get: () => "text/html" } } as any, 401, "Unauthorized");
 
         const { data, error } = await supabase
             .from("appointments")
@@ -18,6 +19,6 @@ export async function GET() {
         if (error) throw error;
         return NextResponse.json({ appointments: data || [] });
     } catch (error: any) {
-        return NextResponse.json({ appointments: [], error: error.message }, { status: 500 });
+        return errorRedirect({ headers: { get: () => "text/html" } } as any, 500, error.message);
     }
 }

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { errorRedirect } from "@/lib/error-redirect";
 import { supabase } from "@/lib/supabase";
 import { sendEmail } from "@/lib/email";
 import AdminOtpEmail from "@/components/email/AdminOtpEmail";
@@ -15,7 +16,7 @@ export async function POST(req: NextRequest) {
     if (action === "send_otp") {
       const trimmedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
       if (!trimmedEmail) {
-        return NextResponse.json({ success: false, error: "Email is required" }, { status: 400 });
+        return errorRedirect(req, 400, "Email is required");
       }
       const { data: admin, error: fetchError } = await supabase
         .from("platform_users")
@@ -26,7 +27,7 @@ export async function POST(req: NextRequest) {
 
       if (fetchError || !admin) {
         console.log("[Admin Auth] send_otp: not admin or fetch error", fetchError?.message ?? "no admin");
-        return NextResponse.json({ success: false, error: "Not authorized as admin" }, { status: 403 });
+        return errorRedirect(req, 403, "Not authorized as admin");
       }
 
       const otpCode = generateOTP();
@@ -39,7 +40,7 @@ export async function POST(req: NextRequest) {
 
       if (updateError) {
         console.error("[Admin Auth] OTP update error", updateError);
-        return NextResponse.json({ success: false, error: "Could not save OTP" }, { status: 500 });
+        return errorRedirect(req, 500, "Could not save OTP");
       }
 
       console.log("[Admin Auth] RESEND_API_KEY present:", !!process.env.RESEND_API_KEY);
@@ -53,7 +54,7 @@ export async function POST(req: NextRequest) {
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Failed to send email";
         console.error("[Admin Auth] sendEmail error", err);
-        return NextResponse.json({ success: false, error: msg }, { status: 500 });
+        return errorRedirect(req, 500, msg);
       }
 
       return NextResponse.json({ success: true, message: "OTP sent to your email" });
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest) {
       const trimmedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
       const trimmedOtp = typeof otp === "string" ? otp.trim() : "";
       if (!trimmedEmail || !trimmedOtp) {
-        return NextResponse.json({ success: false, error: "Email and OTP are required" }, { status: 400 });
+        return errorRedirect(req, 400, "Email and OTP are required");
       }
       const { data: admin, error: fetchError } = await supabase
         .from("platform_users")
@@ -73,15 +74,15 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (fetchError || !admin) {
-        return NextResponse.json({ success: false, error: "Invalid OTP" }, { status: 401 });
+        return errorRedirect(req, 401, "Invalid OTP");
       }
 
       if (admin.otp_code !== trimmedOtp) {
-        return NextResponse.json({ success: false, error: "Invalid OTP" }, { status: 401 });
+        return errorRedirect(req, 401, "Invalid OTP");
       }
 
       if (!admin.otp_expires_at || new Date(admin.otp_expires_at) < new Date()) {
-        return NextResponse.json({ success: false, error: "OTP expired" }, { status: 401 });
+        return errorRedirect(req, 401, "OTP expired");
       }
 
       const { error: clearError } = await supabase
@@ -90,7 +91,7 @@ export async function POST(req: NextRequest) {
         .eq("id", admin.id);
 
       if (clearError) {
-        return NextResponse.json({ success: false, error: "Could not complete login" }, { status: 500 });
+        return errorRedirect(req, 500, "Could not complete login");
       }
 
       const token = Buffer.from(
@@ -122,10 +123,10 @@ export async function POST(req: NextRequest) {
       return response;
     }
 
-    return NextResponse.json({ success: false, error: "Invalid action" }, { status: 400 });
+    return errorRedirect(req, 400, "Invalid action");
   } catch (err) {
     const message = err instanceof Error ? err.message : "Server error";
     console.error("[Admin Auth] Uncaught error", err);
-    return NextResponse.json({ success: false, error: message }, { status: 500 });
+    return errorRedirect(req, 500, message);
   }
 }
