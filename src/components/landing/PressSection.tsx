@@ -1,9 +1,10 @@
 import Image from "next/image";
+import { images } from "@/lib/images";
 
 const outlets = [
-  { name: "TechDaily", logo: "/press1.png" },
-  { name: "EduNews", logo: "/press2.png" },
-  { name: "AIWeekly", logo: "/press3.png" },
+  { name: "TechDaily", logo: images.press.techDaily },
+  { name: "EduNews", logo: images.press.eduNews },
+  { name: "AIWeekly", logo: images.press.aiWeekly },
 ];
 
 export default function PressSection() {

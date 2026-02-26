@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Mic, Phone, BookOpen, Shield, Globe, ArrowRight, Play, Sparkles } from "lucide-react";
 import Image from "next/image";
+import { images } from "@/lib/images";
 
 // Tech stack SVG icons
 function GroqIcon() { return <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none"><circle cx="12" cy="12" r="10" stroke="#F55036" strokeWidth="2" /><path d="M8 12h8M12 8v8" stroke="#F55036" strokeWidth="2" strokeLinecap="round" /></svg>; }
@@ -65,15 +66,13 @@ export default function HeroSection() {
 
                         {/* Left Card */}
                         <div className="relative rounded-3xl overflow-hidden min-h-[280px] sm:min-h-[320px] shadow-xl group">
-                            {/* Optimized Next.js Image for hero-left.png */}
                             <Image
-                                src="/hero-left.png"
+                                src={images.heroLeft}
                                 alt="AI Voice Receptionist"
                                 fill
                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                 className="absolute inset-0 w-full h-full object-cover scale-105 group-hover:scale-110 transition-transform duration-700"
                                 priority
-                                quality={90}
                                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                             />
                             {/* Fallback gradient when no image */}
@@ -127,10 +126,8 @@ export default function HeroSection() {
 
                         {/* Right Card */}
                         <div className="relative rounded-3xl overflow-hidden min-h-[280px] sm:min-h-[320px] shadow-xl group">
-                            {/* Background Image — replace public/hero-right.png */}
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
-                                src="/hero-right.png"
+                                src={images.heroRight}
                                 alt="AI Call Demo"
                                 className="absolute inset-0 w-full h-full object-cover scale-105 group-hover:scale-110 transition-transform duration-700"
                                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}

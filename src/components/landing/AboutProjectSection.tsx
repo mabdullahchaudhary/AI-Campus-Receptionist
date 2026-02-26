@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Mic, ArrowRight, Phone, Globe, Shield, Brain } from "lucide-react";
 import Image from "next/image";
+import { images } from "@/lib/images";
 
 const stats = [
     { value: "50+", label: "Features Built" },
@@ -30,15 +31,13 @@ export default function AboutProjectSection() {
                     {/* Left — Visual Card */}
                     <div className={`transition-all duration-700 ${visible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"}`}>
                         <div className="relative rounded-3xl overflow-hidden min-h-[360px] sm:min-h-[420px] shadow-xl group">
-                            {/* Optimized Next.js Image for about-project.png */}
                             <Image
-                                src="/about-project.png"
+                                src={images.aboutProject}
                                 alt="Superior AI Project"
                                 fill
                                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                 className="absolute inset-0 w-full h-full object-cover scale-105 group-hover:scale-110 transition-transform duration-700"
                                 priority
-                                quality={90}
                                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                             />
                             {/* Fallback */}

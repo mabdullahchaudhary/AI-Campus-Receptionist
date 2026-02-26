@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       await sendEmail({
         to: email,
         subject: "Your Superior AI admin login code",
-        react: <AdminOtpEmail otpCode={otpCode} />,
+        react: AdminOtpEmail({ otpCode }),
       });
 
       return NextResponse.json({ success: true, message: "OTP sent to your email" });

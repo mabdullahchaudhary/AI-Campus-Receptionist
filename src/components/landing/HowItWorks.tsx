@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { MousePointer2, Mic, Database, BarChart3, ArrowRight, Globe, Brain, Phone, Shield, Zap, BookOpen } from "lucide-react";
 import Image from "next/image";
+import { images } from "@/lib/images";
 
 const steps = [
     {
@@ -12,7 +13,7 @@ const steps = [
         desc: "A simple button on your website. No login, no download, no forms. One click and they're connected to Riley instantly.",
         gradient: "from-violet-500 to-indigo-600",
         details: ["Zero friction entry", "Works on any device", "No app download needed"],
-        image: "/how-step-1.png",
+        image: images.howSteps.step1,
     },
     {
         step: "02",
@@ -21,7 +22,7 @@ const steps = [
         desc: "Riley speaks naturally in English, Urdu, or Urdlish. Answers questions, captures contacts, books visits — like a real receptionist.",
         gradient: "from-blue-500 to-cyan-600",
         details: ["Auto language detection", "16 AI tools activated", "Sub-second response time"],
-        image: "/how-step-2.png",
+        image: images.howSteps.step2,
     },
     {
         step: "03",
@@ -30,7 +31,7 @@ const steps = [
         desc: "Names, phone numbers, appointments, lead scores — everything captured and stored in your dashboard without lifting a finger.",
         gradient: "from-emerald-500 to-teal-600",
         details: ["Contact auto-saved to CRM", "Appointments auto-booked", "Lead score auto-calculated"],
-        image: "/how-step-3.png",
+        image: images.howSteps.step3,
     },
     {
         step: "04",
@@ -39,7 +40,7 @@ const steps = [
         desc: "View full transcripts, track sentiments, identify common questions, and continuously improve your AI's response quality.",
         gradient: "from-amber-500 to-orange-600",
         details: ["Full call transcripts", "AI-generated summaries", "Tool usage analytics"],
-        image: "/how-step-4.png",
+        image: images.howSteps.step4,
     },
 ];
 
@@ -100,7 +101,6 @@ export default function HowItWorksSection() {
                                             fill
                                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                             className="absolute inset-0 w-full h-full object-cover scale-105 group-hover:scale-110 transition-transform duration-700"
-                                            quality={90}
                                             onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                                         />
                                         {/* Fallback gradient */}

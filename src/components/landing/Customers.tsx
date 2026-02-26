@@ -1,9 +1,10 @@
 import Image from "next/image";
+import { images } from "@/lib/images";
 
 const customers = [
-  { name: "Superior University", logo: "/logo1.png" },
-  { name: "City College", logo: "/logo2.png" },
-  { name: "Global Institute", logo: "/logo3.png" },
+  { name: "Superior University", logo: images.customers.superiorUniversity },
+  { name: "City College", logo: images.customers.cityCollege },
+  { name: "Global Institute", logo: images.customers.globalInstitute },
 ];
 
 export default function Customers() {
