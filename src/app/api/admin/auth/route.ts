@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
         .single();
 
       if (fetchError || !admin) {
+        console.log("[Admin Auth] send_otp: not admin or fetch error", fetchError?.message ?? "no admin");
         return NextResponse.json({ success: false, error: "Not authorized as admin" }, { status: 403 });
       }
 
@@ -37,9 +38,12 @@ export async function POST(req: NextRequest) {
         .eq("id", admin.id);
 
       if (updateError) {
+        console.error("[Admin Auth] OTP update error", updateError);
         return NextResponse.json({ success: false, error: "Could not save OTP" }, { status: 500 });
       }
 
+      console.log("[Admin Auth] RESEND_API_KEY present:", !!process.env.RESEND_API_KEY);
+      console.log("[Admin Auth] RESEND_FROM_EMAIL present:", !!process.env.RESEND_FROM_EMAIL);
       try {
         await sendEmail({
           to: trimmedEmail,
@@ -48,6 +52,7 @@ export async function POST(req: NextRequest) {
         });
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Failed to send email";
+        console.error("[Admin Auth] sendEmail error", err);
         return NextResponse.json({ success: false, error: msg }, { status: 500 });
       }
 
@@ -120,6 +125,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: false, error: "Invalid action" }, { status: 400 });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Server error";
+    console.error("[Admin Auth] Uncaught error", err);
     return NextResponse.json({ success: false, error: message }, { status: 500 });
   }
 }

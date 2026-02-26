@@ -51,7 +51,10 @@ export async function handleCheckoutCompleted(session: Stripe.Checkout.Session) 
         const user = await getPlatformUserByEmail(email);
         targetUserId = user?.id ?? null;
     }
-    if (!targetUserId) return;
+    if (!targetUserId) {
+        console.error("[Stripe] No target user: metadata.userId=" + (userId ?? "null") + " customer email=" + (email ?? "null"));
+        return;
+    }
     try {
         await createTransaction({
             user_id: targetUserId,
@@ -60,12 +63,19 @@ export async function handleCheckoutCompleted(session: Stripe.Checkout.Session) 
             status: "completed",
             transaction_id: transactionId,
         });
-    } catch {
+    } catch (e) {
+        console.error("[Stripe] createTransaction Supabase error", e);
     }
-    if (userId) {
-        await updateUserPlan(userId, "pro");
-    } else if (email) {
-        await updateUserPlanByEmail(email, "pro");
+    try {
+        if (userId) {
+            await updateUserPlan(userId, "pro");
+        } else if (email) {
+            await updateUserPlanByEmail(email, "pro");
+        }
+    } catch (e: unknown) {
+        const err = e as { message?: string; code?: string; details?: string };
+        console.error("[Stripe] updateUserPlan/updateUserPlanByEmail Supabase error:", err?.message ?? e, "code:", err?.code, "details:", err?.details);
+        throw e;
     }
 }
 

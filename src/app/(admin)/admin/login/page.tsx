@@ -23,7 +23,7 @@ export default function AdminLoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "send_otp", email }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({ success: false, error: "Invalid response" }));
       if (data.success) {
         setStep("otp");
         if (data.dev_otp) setDevOtp(data.dev_otp);
@@ -46,7 +46,7 @@ export default function AdminLoginPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "verify_otp", email, otp }),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({ success: false, error: "Invalid response" }));
       if (data.success) {
         router.push("/admin");
       } else {
