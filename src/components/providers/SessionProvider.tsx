@@ -1,8 +1,8 @@
 "use client";
 
 import { SessionProvider as NextAuthSessionProvider } from "next-auth/react";
-import CleanupAttrs from "@/components/Client/CleanupAttrs";
-import SiteStagePopup from "@/components/Client/SiteStagePopup";
+import CleanupAttrs from "@/components/shared/CleanupAttrs";
+import SiteStagePopup from "@/components/shared/SiteStagePopup";
 
 export default function SessionProvider({
     children,
