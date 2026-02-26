@@ -69,6 +69,29 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ providers: data || [] });
       }
 
+      case "billing": {
+        const { getPendingManualTransactions } = await import("@/features/billing/billing-repo");
+        const [pending, usersRes] = await Promise.all([
+          getPendingManualTransactions(),
+          supabase.from("platform_users").select("id, email, full_name, avatar_url, plan, total_calls_made, last_login_at, created_at").order("created_at", { ascending: false }),
+        ]);
+        const users = usersRes.data || [];
+        const userMap: Record<string, { email: string; full_name: string }> = {};
+        users.forEach((u: { id: string; email: string; full_name: string }) => {
+          userMap[u.id] = { email: u.email, full_name: u.full_name };
+        });
+        const pendingWithUsers = pending.map((t) => ({
+          id: t.id,
+          user_id: t.user_id,
+          amount: t.amount,
+          transaction_id: t.transaction_id,
+          created_at: t.created_at,
+          email: userMap[t.user_id]?.email ?? "",
+          full_name: userMap[t.user_id]?.full_name ?? "",
+        }));
+        return NextResponse.json({ pending: pendingWithUsers, users });
+      }
+
       case "health": {
         const { data } = await supabase
           .from("system_health_log")

@@ -32,6 +32,9 @@ import {
     Calendar,
     Key,
     ArrowUpRight,
+    CreditCard,
+    CheckCircle,
+    XCircle,
 } from "lucide-react";
 
 interface OverviewData {
@@ -80,7 +83,17 @@ interface ProviderData {
     assistant_id: string;
 }
 
-type Tab = "overview" | "users" | "calls" | "providers" | "settings";
+interface PendingTransaction {
+    id: string;
+    user_id: string;
+    amount: number;
+    transaction_id: string | null;
+    created_at: string;
+    email: string;
+    full_name: string;
+}
+
+type Tab = "overview" | "users" | "calls" | "providers" | "billing" | "settings";
 
 export default function AdminDashboard() {
     const router = useRouter();
@@ -91,6 +104,7 @@ export default function AdminDashboard() {
     const [users, setUsers] = useState<UserData[]>([]);
     const [calls, setCalls] = useState<CallData[]>([]);
     const [providers, setProviders] = useState<ProviderData[]>([]);
+    const [pendingBilling, setPendingBilling] = useState<PendingTransaction[]>([]);
     const [expandedCall, setExpandedCall] = useState<string | null>(null);
     const [showAddProvider, setShowAddProvider] = useState(false);
     const [toast, setToast] = useState<{ type: string; msg: string } | null>(null);
@@ -122,6 +136,10 @@ export default function AdminDashboard() {
                 if (section === "users") setUsers(data.users || []);
                 if (section === "calls") setCalls(data.calls || []);
                 if (section === "providers") setProviders(data.providers || []);
+                if (section === "billing") {
+                    setPendingBilling(data.pending || []);
+                    setUsers(data.users || []);
+                }
             } catch (err) {
                 console.error(err);
             }
@@ -131,7 +149,8 @@ export default function AdminDashboard() {
     );
 
     useEffect(() => {
-        fetchData(activeTab === "settings" ? "providers" : activeTab);
+        const section = activeTab === "settings" ? "providers" : activeTab === "billing" ? "billing" : activeTab;
+        fetchData(section);
     }, [activeTab, fetchData]);
 
     useEffect(() => {
@@ -238,6 +257,24 @@ export default function AdminDashboard() {
         setActionLoading(null);
     };
 
+    const handleBillingVerify = async (transactionId: string, action: "approve" | "reject") => {
+        setActionLoading(transactionId);
+        try {
+            const res = await fetch("/api/admin/billing/verify", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: transactionId, action }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Failed");
+            showToast("success", action === "approve" ? "Payment approved — user upgraded to Pro" : "Payment rejected");
+            fetchData("billing");
+        } catch (e: unknown) {
+            showToast("error", e instanceof Error ? e.message : "Request failed");
+        }
+        setActionLoading(null);
+    };
+
     const handleReclone = async (providerId: string) => {
         if (!mainPrivateKey) {
             showToast("error", "Set main key in Settings!");
@@ -274,6 +311,7 @@ export default function AdminDashboard() {
         { id: "overview" as Tab, label: "Overview", icon: BarChart3 },
         { id: "users" as Tab, label: "Users", icon: Users },
         { id: "calls" as Tab, label: "Call Logs", icon: Phone },
+        { id: "billing" as Tab, label: "Billing", icon: CreditCard },
         { id: "providers" as Tab, label: "Providers", icon: Server },
         { id: "settings" as Tab, label: "Settings", icon: Settings },
     ];
@@ -573,6 +611,93 @@ export default function AdminDashboard() {
                                             No users registered yet
                                         </div>
                                     )}
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === "billing" && (
+                            <div className="space-y-8">
+                                <div className="bg-white rounded-2xl border border-gray-200/60 shadow-sm overflow-hidden">
+                                    <div className="px-6 py-4 border-b border-gray-100">
+                                        <h3 className="font-heading font-bold">Pending Verifications</h3>
+                                        <p className="text-xs text-muted-foreground mt-0.5">Manual Bank/JazzCash TID submissions — approve or reject</p>
+                                    </div>
+                                    <div className="divide-y divide-gray-100">
+                                        {pendingBilling.length === 0 ? (
+                                            <div className="px-6 py-12 text-center text-sm text-muted-foreground">No pending submissions</div>
+                                        ) : (
+                                            pendingBilling.map((t) => (
+                                                <div key={t.id} className="px-4 sm:px-6 py-4 flex flex-wrap items-center gap-3 sm:gap-4">
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-sm font-medium truncate">{t.full_name || t.email || t.user_id}</p>
+                                                        <p className="text-xs text-muted-foreground truncate">{t.email}</p>
+                                                    </div>
+                                                    <div className="text-xs text-muted-foreground">${t.amount} · TID: <span className="font-mono">{t.transaction_id || "—"}</span></div>
+                                                    <div className="text-xs text-muted-foreground">{new Date(t.created_at).toLocaleString()}</div>
+                                                    <div className="flex items-center gap-2">
+                                                        <button
+                                                            onClick={() => handleBillingVerify(t.id, "approve")}
+                                                            disabled={actionLoading === t.id}
+                                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-100 text-emerald-700 text-xs font-bold hover:bg-emerald-200 transition-colors disabled:opacity-50"
+                                                        >
+                                                            {actionLoading === t.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle className="w-3.5 h-3.5" />}
+                                                            Approve
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleBillingVerify(t.id, "reject")}
+                                                            disabled={actionLoading === t.id}
+                                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-100 text-red-700 text-xs font-bold hover:bg-red-200 transition-colors disabled:opacity-50"
+                                                        >
+                                                            <XCircle className="w-3.5 h-3.5" />
+                                                            Reject
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="bg-white rounded-2xl border border-gray-200/60 shadow-sm overflow-hidden">
+                                    <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                                        <h3 className="font-heading font-bold">User Plan Management</h3>
+                                    </div>
+                                    <div className="divide-y divide-gray-100">
+                                        {users.map((user) => (
+                                            <div
+                                                key={user.id}
+                                                className="px-4 sm:px-6 py-4 flex items-center gap-3 sm:gap-4 hover:bg-gray-50/50 transition-colors"
+                                            >
+                                                {user.avatar_url ? (
+                                                    <img src={user.avatar_url} alt="" className="w-10 h-10 rounded-xl object-cover shrink-0" />
+                                                ) : (
+                                                    <div className="w-10 h-10 rounded-xl bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold shrink-0">
+                                                        {user.full_name?.charAt(0)}
+                                                    </div>
+                                                )}
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-medium truncate">{user.full_name}</p>
+                                                    <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                                                </div>
+                                                <div className="text-xs text-muted-foreground text-right hidden sm:block">
+                                                    <p>{user.total_calls_made || 0} calls</p>
+                                                    <p>{user.created_at ? new Date(user.created_at).toLocaleDateString() : ""}</p>
+                                                </div>
+                                                <select
+                                                    value={user.plan}
+                                                    onChange={(e) => handleChangePlan(user.id, e.target.value)}
+                                                    disabled={actionLoading === user.id}
+                                                    className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1.5 rounded-lg border-0 cursor-pointer transition-all ${planColors[user.plan]}`}
+                                                >
+                                                    <option value="free">Free</option>
+                                                    <option value="pro">Pro</option>
+                                                    <option value="enterprise">Enterprise</option>
+                                                </select>
+                                            </div>
+                                        ))}
+                                        {users.length === 0 && (
+                                            <div className="px-6 py-16 text-center text-sm text-muted-foreground">No users</div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         )}

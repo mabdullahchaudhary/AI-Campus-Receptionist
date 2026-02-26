@@ -151,9 +151,8 @@ export default function PricingSection() {
                   <span className="text-[14px] text-gray-400 font-medium">/{plan.period}</span>
                 </div>
 
-                {/* CTA Button */}
                 <Link
-                  href="/login"
+                  href={plan.tier === "pro" ? "/dashboard/billing" : "/login"}
                   className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl text-[14px] font-bold transition-all duration-300 ${plan.highlighted
                       ? "bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-violet-500/20 hover:shadow-violet-500/30 hover:scale-[1.02]"
                       : plan.tier === "enterprise"
