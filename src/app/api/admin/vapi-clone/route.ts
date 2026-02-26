@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
-import { VAPI_API_URL } from "@/lib/config";
+import { VAPI_API_URL, N8N_WEBHOOK_URL } from "@/lib/config";
 import { buildSystemPrompt } from "@/lib/ai/prompt";
 import { verifyAdminToken } from "@/features/auth/admin/token";
 import { getAllTools } from "@/features/agent/tools-registry";

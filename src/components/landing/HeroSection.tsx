@@ -19,7 +19,7 @@ export default function HeroSection() {
 
     return (
         <section id="hero" className="relative overflow-hidden">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[90vw] max-w-[1000px] h-[40vh] sm:h-[600px] max-h-[600px] bg-gradient-to-b from-violet-50/60 via-indigo-50/30 to-transparent rounded-full blur-3xl -z-10" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[90vw] max-w-[1000px] h-[40vh] sm:h-[600px] max-h-[600px] bg-linear-to-b from-violet-50/60 via-indigo-50/30 to-transparent rounded-full blur-3xl -z-10" />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 sm:pt-6 lg:pt-8 pb-14 sm:pb-16">
                 {/* Badge */}
@@ -76,9 +76,9 @@ export default function HeroSection() {
                                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                             />
                             {/* Fallback gradient when no image */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 -z-10" />
+                            <div className="absolute inset-0 bg-linear-to-br from-gray-900 via-gray-800 to-gray-900 -z-10" />
                             {/* Dark overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-gray-900/30" />
+                            <div className="absolute inset-0 bg-linear-to-t from-gray-900 via-gray-900/50 to-gray-900/30" />
 
                             {/* Animated Voice Waveform */}
                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-[3px]">
@@ -96,9 +96,9 @@ export default function HeroSection() {
                             <div className="absolute bottom-0 left-0 right-0 p-6">
                                 <div className="flex items-center gap-3 mb-3">
                                     <div className="flex -space-x-2">
-                                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center border-2 border-gray-800 z-30"><Mic className="w-4 h-4 text-white" /></div>
-                                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center border-2 border-gray-800 z-20"><Phone className="w-4 h-4 text-white" /></div>
-                                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center border-2 border-gray-800 z-10"><Globe className="w-4 h-4 text-white" /></div>
+                                        <div className="w-9 h-9 rounded-full bg-linear-to-br from-violet-500 to-indigo-600 flex items-center justify-center border-2 border-gray-800 z-30"><Mic className="w-4 h-4 text-white" /></div>
+                                        <div className="w-9 h-9 rounded-full bg-linear-to-br from-emerald-500 to-teal-600 flex items-center justify-center border-2 border-gray-800 z-20"><Phone className="w-4 h-4 text-white" /></div>
+                                        <div className="w-9 h-9 rounded-full bg-linear-to-br from-amber-500 to-orange-600 flex items-center justify-center border-2 border-gray-800 z-10"><Globe className="w-4 h-4 text-white" /></div>
                                         <div className="w-9 h-9 rounded-full bg-gray-700 flex items-center justify-center border-2 border-gray-800 text-[11px] font-bold text-gray-300">+16</div>
                                     </div>
                                 </div>
@@ -116,7 +116,7 @@ export default function HeroSection() {
                                 { icon: BookOpen, label: "Smart Training", gradient: "from-amber-600 to-orange-600" },
                             ].map((f) => (
                                 <div key={f.label} className="flex items-center gap-3 px-4 py-4 sm:py-5 rounded-2xl bg-gray-900 text-white shadow-lg hover:scale-[1.03] transition-transform duration-300 cursor-default">
-                                    <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${f.gradient} flex items-center justify-center shrink-0 shadow-lg`}>
+                                    <div className={`w-10 h-10 rounded-xl bg-linear-to-br ${f.gradient} flex items-center justify-center shrink-0 shadow-lg`}>
                                         <f.icon className="w-[18px] h-[18px] text-white" />
                                     </div>
                                     <span className="text-[13px] font-semibold leading-tight">{f.label}</span>
@@ -133,15 +133,15 @@ export default function HeroSection() {
                                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                             />
                             {/* Fallback */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-violet-100 via-indigo-50 to-violet-50 -z-10" />
+                            <div className="absolute inset-0 bg-linear-to-br from-violet-100 via-indigo-50 to-violet-50 -z-10" />
                             {/* Light overlay for readability */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-white/70 via-white/30 to-white/20" />
+                            <div className="absolute inset-0 bg-linear-to-t from-white/70 via-white/30 to-white/20" />
 
                             <div className="absolute inset-0 flex flex-col justify-center items-center z-10">
                                 {/* Animated play ring — smaller size */}
                                 <div className="relative mb-4">
-                                    <div className="absolute -inset-2 w-[72px] h-[72px] sm:w-[80px] sm:h-[80px] rounded-full bg-violet-400/20 animate-ping" style={{ animationDuration: "2s" }} />
-                                    <a href="#demo" onClick={(e) => { e.preventDefault(); document.getElementById("demo")?.scrollIntoView({ behavior: "smooth" }); }} className="relative w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-full bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-xl shadow-violet-500/30 hover:shadow-violet-500/40 hover:scale-110 transition-all duration-300 z-10">
+                                    <div className="absolute -inset-2 w-[72px] h-[72px] sm:w-[80px] sm:h-[80px] rounded-full bg-linear-to-br from-violet-400/40 to-indigo-400/40 animate-ping" style={{ animationDuration: "2s" }} />
+                                    <a href="#demo" onClick={(e) => { e.preventDefault(); document.getElementById("demo")?.scrollIntoView({ behavior: "smooth" }); }} className="relative w-16 h-16 sm:w-[72px] sm:h-[72px] rounded-full bg-linear-to-br from-violet-600 to-indigo-600 flex items-center justify-center shadow-xl shadow-violet-500/30 hover:shadow-violet-500/40 hover:scale-110 transition-all duration-300 z-10">
                                         <Play className="w-6 h-6 sm:w-7 sm:h-7 text-white ml-0.5" fill="white" />
                                     </a>
                                 </div>

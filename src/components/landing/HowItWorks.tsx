@@ -103,9 +103,8 @@ export default function HowItWorksSection() {
                                             className="absolute inset-0 w-full h-full object-cover scale-105 group-hover:scale-110 transition-transform duration-700"
                                             onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                                         />
-                                        {/* Fallback gradient */}
-                                        <div className={`absolute inset-0 bg-gradient-to-br ${step.gradient} opacity-90 -z-10`} />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10" />
+                                        <div className={`absolute inset-0 bg-linear-to-br ${step.gradient} opacity-90 -z-10`} />
+                                        <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-black/10" />
 
                                         {/* Step number overlay */}
                                         <div className="absolute top-6 left-6">
@@ -130,10 +129,10 @@ export default function HowItWorksSection() {
                                 {/* Content Side */}
                                 <div className={`${isEven ? "lg:order-2" : "lg:order-1"}`}>
                                     <div className="flex items-center gap-3 mb-4">
-                                        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${step.gradient} flex items-center justify-center shadow-lg`}>
+                                        <div className={`w-10 h-10 rounded-xl bg-linear-to-br ${step.gradient} flex items-center justify-center shadow-lg`}>
                                             <span className="text-white text-[14px] font-heading font-bold">{step.step}</span>
                                         </div>
-                                        <div className="h-[2px] flex-1 bg-gradient-to-r from-gray-200 to-transparent rounded-full" />
+                                        <div className="h-[2px] flex-1 bg-linear-to-r from-gray-200 to-transparent rounded-full" />
                                     </div>
 
                                     <h3 className="text-[20px] sm:text-[24px] font-heading font-extrabold">{step.title}</h3>
@@ -202,7 +201,7 @@ export default function HowItWorksSection() {
                             },
                         ].map((layer) => (
                             <div key={layer.title} className="bg-white rounded-2xl border border-gray-200/60 p-5 shadow-card hover:shadow-card-hover transition-shadow">
-                                <div className={`w-full h-1 rounded-full bg-gradient-to-r ${layer.gradient} mb-4`} />
+                                <div className={`w-full h-1 rounded-full bg-linear-to-r ${layer.gradient} mb-4`} />
                                 <h4 className="text-[14px] font-heading font-bold">{layer.title}</h4>
                                 <p className="text-[12px] text-gray-400 mt-1.5 leading-relaxed">{layer.desc}</p>
                             </div>
@@ -214,7 +213,7 @@ export default function HowItWorksSection() {
                 <div className={`mt-14 text-center transition-all duration-700 delay-600 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
                     <a
                         href="/login"
-                        className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-[14px] font-bold uppercase tracking-wide shadow-xl shadow-violet-500/25 hover:shadow-violet-500/35 hover:scale-[1.02] transition-all duration-300"
+                        className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-linear-to-r from-violet-600 to-indigo-600 text-white text-[14px] font-bold uppercase tracking-wide shadow-xl shadow-violet-500/25 hover:shadow-violet-500/35 hover:scale-[1.02] transition-all duration-300"
                     >
                         Try Riley Free Now <ArrowRight className="w-4 h-4" />
                     </a>

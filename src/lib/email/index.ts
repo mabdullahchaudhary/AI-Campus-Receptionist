@@ -23,29 +23,27 @@ export async function sendEmail({ to, subject, html, react }: SendEmailParams) {
     throw new Error("RESEND_FROM_EMAIL is not configured");
   }
 
-  const payload: {
-    from: string;
-    to: string;
-    subject: string;
-    html?: string;
-    react?: ReactElement;
-  } = {
-    from,
-    to,
-    subject,
-  };
-
   if (react) {
-    payload.react = react;
-  } else if (html) {
-    payload.html = html;
-  } else {
-    throw new Error("Either html or react content is required");
+    const result = await resend.emails.send({
+      from,
+      to,
+      subject,
+      react,
+    });
+    return result;
   }
 
-  const result = await resend.emails.send(payload);
+  if (html) {
+    const result = await resend.emails.send({
+      from,
+      to,
+      subject,
+      html,
+    });
+    return result;
+  }
 
-  return result;
+  throw new Error("Either html or react content is required");
 }
 
 

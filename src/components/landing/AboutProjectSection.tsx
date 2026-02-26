@@ -41,8 +41,8 @@ export default function AboutProjectSection() {
                                 onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                             />
                             {/* Fallback */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-violet-900 -z-10" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/50 to-gray-900/20" />
+                            <div className="absolute inset-0 bg-linear-to-br from-gray-900 via-gray-800 to-violet-900 -z-10" />
+                            <div className="absolute inset-0 bg-linear-to-t from-gray-900 via-gray-900/50 to-gray-900/20" />
 
                             {/* Floating badges */}
                             <div className="absolute top-6 left-6 flex flex-col gap-2.5">
@@ -56,7 +56,7 @@ export default function AboutProjectSection() {
                                         className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 shadow-lg"
                                         style={{ animationDelay: `${i * 200}ms` }}
                                     >
-                                        <div className={`w-7 h-7 rounded-lg bg-gradient-to-br ${badge.color} flex items-center justify-center`}>
+                                        <div className={`w-7 h-7 rounded-lg bg-linear-to-br ${badge.color} flex items-center justify-center`}>
                                             <badge.icon className="w-3.5 h-3.5 text-white" />
                                         </div>
                                         <span className="text-[12px] font-semibold text-white/90">{badge.label}</span>
@@ -120,7 +120,7 @@ export default function AboutProjectSection() {
                             <a
                                 href="#features"
                                 onClick={(e) => { e.preventDefault(); document.getElementById("features")?.scrollIntoView({ behavior: "smooth" }); }}
-                                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-[13.5px] font-bold shadow-lg shadow-violet-500/25 hover:shadow-violet-500/35 hover:scale-[1.02] transition-all duration-300"
+                                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-linear-to-r from-violet-600 to-indigo-600 text-white text-[13.5px] font-bold shadow-lg shadow-violet-500/25 hover:shadow-violet-500/35 hover:scale-[1.02] transition-all duration-300"
                             >
                                 Explore Features <ArrowRight className="w-4 h-4" />
                             </a>
