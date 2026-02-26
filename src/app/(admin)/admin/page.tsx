@@ -313,7 +313,7 @@ export default function AdminDashboard() {
                         </div>
                         <div>
                             <span className="font-heading font-bold">Superior AI</span>
-                            <span className="text-[10px] text-white font-bold uppercase tracking-wider ml-2 bg-gradient-to-r from-violet-600 to-indigo-600 px-2.5 py-0.5 rounded-md">
+                            <span className="text-[10px] text-white font-bold uppercase tracking-wider ml-2 bg-linear-to-r from-violet-600 to-indigo-600 px-2.5 py-0.5 rounded-md">
                                 Admin
                             </span>
                         </div>
