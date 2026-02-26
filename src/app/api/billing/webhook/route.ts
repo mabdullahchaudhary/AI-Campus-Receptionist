@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     }
     console.log("[Webhook] Event type: " + event.type);
     if (event.type === "checkout.session.completed") {
-        const session = event.data.object as { mode?: string; customer_email?: string; customer_details?: { email?: string }; metadata?: { userId?: string } };
+        const session = event.data.object as import("stripe").Stripe.Checkout.Session;
         const email = session.customer_email ?? session.customer_details?.email ?? null;
         console.log("[Webhook] User Email: " + (email ?? "null"));
         console.log("[Webhook] metadata.userId: " + (session.metadata?.userId ?? "null"));

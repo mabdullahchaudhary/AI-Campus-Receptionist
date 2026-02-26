@@ -14,7 +14,7 @@ export default function AdminOtpEmail({ otpCode }: AdminOtpEmailProps) {
           <Container className="mx-auto my-8 w-full max-w-xl rounded-2xl bg-white px-6 py-8 shadow-lg">
             <Section className="mb-6 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-linear-to-br from-violet-600 to-indigo-600 text-white text-sm font-semibold">
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-600 text-white text-sm font-semibold">
                   SA
                 </div>
                 <div>
