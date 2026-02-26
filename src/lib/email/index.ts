@@ -1,7 +1,33 @@
-// Stub for transactional email utility
-// Extend with Resend, SendGrid, or SMTP integration as needed
+import { Resend } from "resend";
 
-export async function sendEmail({ to, subject, html }: { to: string; subject: string; html: string }) {
-  // TODO: Integrate real email provider
-  return { success: true, message: "Email sent (stub)" };
+const apiKey = process.env.RESEND_API_KEY;
+
+const resend = apiKey ? new Resend(apiKey) : null;
+
+interface SendEmailParams {
+  to: string;
+  subject: string;
+  html: string;
 }
+
+export async function sendEmail({ to, subject, html }: SendEmailParams) {
+  if (!resend) {
+    throw new Error("RESEND_API_KEY is not configured");
+  }
+
+  const from = process.env.RESEND_FROM_EMAIL;
+
+  if (!from) {
+    throw new Error("RESEND_FROM_EMAIL is not configured");
+  }
+
+  const result = await resend.emails.send({
+    from,
+    to,
+    subject,
+    html,
+  });
+
+  return result;
+}
+
