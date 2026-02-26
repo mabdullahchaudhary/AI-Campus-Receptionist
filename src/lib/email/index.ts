@@ -30,6 +30,7 @@ export async function sendEmail({ to, subject, html, react }: SendEmailParams) {
       subject,
       react,
     });
+    if (result.error) throw new Error(result.error.message || "Resend send failed");
     return result;
   }
 
@@ -40,6 +41,7 @@ export async function sendEmail({ to, subject, html, react }: SendEmailParams) {
       subject,
       html,
     });
+    if (result.error) throw new Error(result.error.message || "Resend send failed");
     return result;
   }
 

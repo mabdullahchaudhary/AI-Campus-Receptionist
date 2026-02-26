@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import { APP_URL } from "@/lib/config";
-import { createTransaction, updateUserPlan } from "./billing-repo";
+import { createTransaction, updateUserPlan, updateUserPlanByEmail, getPlatformUserByEmail } from "./billing-repo";
 
 function getStripe(): Stripe {
     const key = process.env.STRIPE_SECRET_KEY;
@@ -36,17 +36,37 @@ export async function createCheckoutSession(userId: string, userEmail: string) {
     return session;
 }
 
+function getCustomerEmail(session: Stripe.Checkout.Session): string | null {
+    const email = session.customer_email ?? session.customer_details?.email ?? null;
+    return typeof email === "string" ? email : null;
+}
+
 export async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     const userId = session.metadata?.userId as string | undefined;
-    if (!userId) return;
-    await createTransaction({
-        user_id: userId,
-        amount: (session.amount_total ?? PRO_PRICE_AMOUNT) / 100,
-        method: "stripe",
-        status: "completed",
-        transaction_id: session.payment_intent as string || session.id,
-    });
-    await updateUserPlan(userId, "pro");
+    const email = getCustomerEmail(session);
+    const amount = (session.amount_total ?? PRO_PRICE_AMOUNT) / 100;
+    const transactionId = (typeof session.payment_intent === "string" ? session.payment_intent : session.payment_intent?.id) || session.id;
+    let targetUserId: string | null = userId ? userId : null;
+    if (!targetUserId && email) {
+        const user = await getPlatformUserByEmail(email);
+        targetUserId = user?.id ?? null;
+    }
+    if (!targetUserId) return;
+    try {
+        await createTransaction({
+            user_id: targetUserId,
+            amount,
+            method: "stripe",
+            status: "completed",
+            transaction_id: transactionId,
+        });
+    } catch {
+    }
+    if (userId) {
+        await updateUserPlan(userId, "pro");
+    } else if (email) {
+        await updateUserPlanByEmail(email, "pro");
+    }
 }
 
 export async function constructWebhookEvent(payload: string | Buffer, signature: string) {

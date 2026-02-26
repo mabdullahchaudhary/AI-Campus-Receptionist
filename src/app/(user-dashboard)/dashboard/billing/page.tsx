@@ -97,7 +97,7 @@ export default function BillingPage() {
     useEffect(() => {
         const success = searchParams.get("success");
         const canceled = searchParams.get("canceled");
-        if (success === "true") setBanner({ type: "success", text: "Payment successful. Your plan has been upgraded to Pro." });
+        if (success === "true") setBanner({ type: "success", text: "Success! Plan Upgraded." });
         if (canceled === "true") setBanner({ type: "canceled", text: "Checkout was canceled." });
     }, [searchParams]);
 
@@ -132,7 +132,7 @@ export default function BillingPage() {
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || "Submission failed");
-            setManualMessage({ type: "success", text: "Submission received. Your upgrade will be activated after admin verification." });
+            setManualMessage({ type: "success", text: "Payment Pending Admin Approval." });
             setManualTid("");
         } catch (e) {
             setManualMessage({ type: "error", text: e instanceof Error ? e.message : "Submission failed" });

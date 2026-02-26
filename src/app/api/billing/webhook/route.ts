@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { constructWebhookEvent, handleCheckoutCompleted } from "@/features/billing/stripe";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
     const signature = req.headers.get("stripe-signature");
     if (!signature) {

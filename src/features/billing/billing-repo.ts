@@ -83,6 +83,27 @@ export async function updateUserPlan(userId: string, plan: PlanTier) {
     return data;
 }
 
+export async function updateUserPlanByEmail(email: string, plan: PlanTier) {
+    const { data, error } = await supabase
+        .from("platform_users")
+        .update({ plan })
+        .eq("email", email)
+        .select()
+        .single();
+    if (error) throw error;
+    return data;
+}
+
+export async function getPlatformUserByEmail(email: string) {
+    const { data, error } = await supabase
+        .from("platform_users")
+        .select("id, email, full_name, plan")
+        .eq("email", email)
+        .single();
+    if (error) return null;
+    return data;
+}
+
 export async function getUserById(userId: string) {
     const { data, error } = await supabase
         .from("platform_users")

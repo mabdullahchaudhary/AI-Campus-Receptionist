@@ -32,8 +32,9 @@ export default function AdminLoginPage() {
       }
     } catch {
       setError("Network error");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleVerifyOTP = async () => {
@@ -53,8 +54,9 @@ export default function AdminLoginPage() {
       }
     } catch {
       setError("Network error");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
