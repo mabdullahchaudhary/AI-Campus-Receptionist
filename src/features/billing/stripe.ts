@@ -1,12 +1,17 @@
 import Stripe from "stripe";
-import { STRIPE_SECRET_KEY, APP_URL } from "@/lib/config";
+import { APP_URL } from "@/lib/config";
 import { createTransaction, updateUserPlan } from "./billing-repo";
 
-export const stripe = new Stripe(STRIPE_SECRET_KEY);
+function getStripe(): Stripe {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) throw new Error("STRIPE_SECRET_KEY is not set");
+    return new Stripe(key);
+}
 
 const PRO_PRICE_AMOUNT = 2900;
 
 export async function createCheckoutSession(userId: string, userEmail: string) {
+    const stripe = getStripe();
     const session = await stripe.checkout.sessions.create({
         mode: "payment",
         payment_method_types: ["card"],
@@ -45,6 +50,7 @@ export async function handleCheckoutCompleted(session: Stripe.Checkout.Session) 
 }
 
 export async function constructWebhookEvent(payload: string | Buffer, signature: string) {
-    const { STRIPE_WEBHOOK_SECRET } = await import("@/lib/config");
-    return stripe.webhooks.constructEvent(payload, signature, STRIPE_WEBHOOK_SECRET);
+    const secret = process.env.STRIPE_WEBHOOK_SECRET;
+    if (!secret) throw new Error("STRIPE_WEBHOOK_SECRET is not set");
+    return getStripe().webhooks.constructEvent(payload, signature, secret);
 }
