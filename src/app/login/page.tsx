@@ -15,7 +15,7 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen bg-white flex">
-            <div className="hidden lg:flex w-1/2 bg-gradient-to-br from-violet-600 via-indigo-600 to-slate-900 text-white flex-col justify-between p-10 relative overflow-hidden">
+            <div className="hidden lg:flex w-1/2 bg-linear-to-br from-violet-600 via-indigo-600 to-slate-900 text-white flex-col justify-between p-10 relative overflow-hidden">
                 <div className="absolute inset-0 opacity-40 bg-[radial-gradient(circle_at_10%_20%,rgba(255,255,255,0.12),transparent_60%),radial-gradient(circle_at_80%_0,rgba(255,255,255,0.18),transparent_55%),radial-gradient(circle_at_0_80%,rgba(255,255,255,0.1),transparent_55%)]" />
                 <div className="relative z-10">
                     <Link href="/" className="inline-flex items-center gap-2 text-sm text-violet-100 hover:text-white transition-colors">
